@@ -29,7 +29,7 @@ WRAPOBJ       = $(INTERFACE:.i=_wrap.o)
 TARGET        = module.so # Use this kind of target for dynamic loading
 #TARGET        = mypython  # Use this target for static linking
 
-prefix        = /home/beazley/Packages
+prefix        = /home/beazley/scratch
 exec_prefix   = ${prefix}
 
 CC            = gcc
@@ -78,12 +78,12 @@ XINCLUDE      = -I/usr/X11R6/include
 
 # Python installation
 
-PY_INCLUDE    = -DHAVE_CONFIG_H -I/home/beazley/Packages/include/python1.5 -I/home/beazley/Packages/lib/python1.5/config 
-PY_LIB        = /home/beazley/Packages/lib/python1.5/config
+PY_INCLUDE    = -DHAVE_CONFIG_H -I/home/beazley/scratch/include/python1.4 -I/home/beazley/scratch/lib/python1.4/config 
+PY_LIB        = /home/beazley/scratch/lib/python1.4/config
 
 # Tcl installation.  Needed if rebuilding Python with tkinter.
 
-TCL_INCLUDE   = -I/home/beazley/Packages/include
+TCL_INCLUDE   = -I/usr/local/include
 TCL_LIB       = -L/usr/local/lib
 
 # Build libraries (needed for static builds)
@@ -96,7 +96,7 @@ SYSLIBS       = $(LIBM) $(LIBC) -ldl
 
 #TKINTER      = $(TCL_LIB) -ltk -ltcl $(XLIB)
 BUILD_LIBS    = $(LIBS) # Dynamic loading
-#BUILD_LIBS    = $(PY_LIB) -lpython1.5 $(TKINTER) $(LIBS) $(SYSLIBS)
+#BUILD_LIBS    = $(PY_LIB) -lModules -lPython -lObjects -lParser $(TKINTER) $(LIBS) $(SYSLIBS)
 
 # Compilation rules for non-SWIG components
 

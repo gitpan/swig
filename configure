@@ -2212,7 +2212,7 @@ fi
 if test "${with_tclincl+set}" = set; then
   withval="$with_tclincl"
   
-	TCLINCLUDE="$withval"
+	TCLINCLUDE="-I$withval"
 else
   TCLINCLUDE=nope
 fi
@@ -2221,7 +2221,7 @@ fi
 if test "${with_tcllib+set}" = set; then
   withval="$with_tcllib"
   
-	TCLLIB="$withval"
+	TCLLIB="-L$withval"
 else
   TCLLIB=nope
 fi
@@ -2321,7 +2321,7 @@ fi
 if test "${with_itclincl+set}" = set; then
   withval="$with_itclincl"
   
-	ITCLINCLUDE="$withval"
+	ITCLINCLUDE="-I$withval"
 else
   ITCLINCLUDE=nope
 fi
@@ -2330,7 +2330,7 @@ fi
 if test "${with_itcllib+set}" = set; then
   withval="$with_itcllib"
   
-	ITCLLIB="$withval"
+	ITCLLIB="-L$withval"
 else
   ITCLLIB=nope
 fi

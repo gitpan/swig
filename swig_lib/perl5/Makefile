@@ -29,7 +29,7 @@ WRAPOBJ       = $(INTERFACE:.i=_wrap.o)
 TARGET        = module.so # Use this kind of target for dynamic loading
 #TARGET        = myperl  # Use this target for static linking
 
-prefix        = /home/beazley/Packages
+prefix        = /home/beazley/scratch
 exec_prefix   = ${prefix}
 
 CC            = gcc
@@ -84,7 +84,7 @@ PERL_FLAGS    = -Dbool=char -Dexplicit=
 
 # Tcl installation.  If using Tk you might need this
 
-TCL_INCLUDE   = -I/home/beazley/Packages/include
+TCL_INCLUDE   = -I/usr/local/include
 TCL_LIB       = -L/usr/local/lib
 
 # Build libraries (needed for static builds)

@@ -9,7 +9,7 @@
 # build shared libraries.  If that doesn't work, a static
 # library is built instead.
 
-prefix      = /home/beazley/Packages
+prefix      = /home/beazley/scratch
 exec_prefix = ${prefix}
 CC          = gcc
 AR          = ar
@@ -43,7 +43,7 @@ clean::
 # Tcl runtime library
 # ----------------------------------------------------------------------
 
-TCL_INCLUDE = -I/home/beazley/Packages/include
+TCL_INCLUDE = -I/usr/local/include
 TCL_LIB     = -L/usr/local/lib
 
 # Tcl 7.x shared
@@ -76,8 +76,8 @@ tcl8_lib:
 # Python run-time library
 # ----------------------------------------------------------------------
 
-PYTHON_INCLUDE= -DHAVE_CONFIG_H -I/home/beazley/Packages/include/python1.5 -I/home/beazley/Packages/lib/python1.5/config
-PYTHON_LIB    = /home/beazley/Packages/lib/python1.5/config
+PYTHON_INCLUDE= -DHAVE_CONFIG_H -I/home/beazley/scratch/include/python1.4 -I/home/beazley/scratch/lib/python1.4/config
+PYTHON_LIB    = /home/beazley/scratch/lib/python1.4/config
 
 # Python shared
 

@@ -30,18 +30,16 @@ All functions return void pointers, but realloc() and free() will operate
 on any sort of pointer.   Sizes should be specified in bytes.
 %}
 
-typedef unsigned int size_t;
-
-void  *calloc(size_t nobj, size_t size);
+void  *calloc(unsigned nobj, unsigned size);
 /* Returns a pointer to a space for an array of nobj objects, each with
    size bytes.   Returns NULL if the request can't be satisfied. 
    Initializes the space to zero bytes. */
 
-void  *malloc(size_t size);
+void  *malloc(unsigned size);
 /* Returns a pointer to space for an object of size bytes.  Returns NULL
    upon failure. */
 
-void  *realloc(void *ptr, size_t size);
+void  *realloc(void *ptr, unsigned size);
 /* Changes the size of the object pointed to by ptr to size bytes. 
    The contents will be unchanged up the minimum of the old and new
    sizes.  Returns a pointer to the new space of NULL upon failure,

@@ -1137,7 +1137,7 @@ void PERL5::link_variable(char *name, char *iname, DataType *t)
 
   // Create a new scalar that we will attach magic to
 
-  vinit << tab4 << "sv = perl_get_sv(\"" << iname << "\",TRUE);\n";
+  vinit << tab4 << "sv = perl_get_sv(\"" << iname << "\",TRUE | 0x2);\n";
 
   // Create a Perl function for setting the variable value
 
@@ -1338,7 +1338,7 @@ static const char *setiv = "#ifndef PERL_OBJECT\
 \nstatic void _swig_setiv(CPerl *pPerl, char *name, long value) { \
 \n#endif\
 \n     SV *sv; \
-\n     sv = perl_get_sv(name,TRUE);\
+\n     sv = perl_get_sv(name,TRUE | 0x2);\
 \n     sv_setiv(sv, (IV) value);\
 \n     SvREADONLY_on(sv);\
 \n}\n";
@@ -1351,7 +1351,7 @@ static const char *setnv = "#ifndef PERL_OBJECT\
 \nstatic void _swig_setnv(CPerl *pPerl, char *name, double value) { \
 \n#endif\
 \n     SV *sv; \
-\n     sv = perl_get_sv(name,TRUE);\
+\n     sv = perl_get_sv(name,TRUE | 0x2);\
 \n     sv_setnv(sv, value);\
 \n     SvREADONLY_on(sv);\
 \n}\n";
@@ -1364,7 +1364,7 @@ static const char *setpv = "#ifndef PERL_OBJECT\
 \nstatic void _swig_setpv(CPerl *pPerl, char *name, char *value) { \
 \n#endif\
 \n     SV *sv; \
-\n     sv = perl_get_sv(name,TRUE);\
+\n     sv = perl_get_sv(name,TRUE | 0x2);\
 \n     sv_setpv(sv, value);\
 \n     SvREADONLY_on(sv);\
 \n}\n";
@@ -1377,7 +1377,7 @@ static const char *setrv = "#ifndef PERL_OBJECT\
 \nstatic void _swig_setrv(CPerl *pPerl, char *name, void *value, char *type) { \
 \n#endif\
 \n     SV *sv; \
-\n     sv = perl_get_sv(name,TRUE);\
+\n     sv = perl_get_sv(name,TRUE | 0x2);\
 \n     sv_setref_pv(sv, type, value);\
 \n     SvREADONLY_on(sv);\
 \n}\n";

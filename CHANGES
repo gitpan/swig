@@ -1,5 +1,19 @@
 SWIG (Simplified Wrapper and Interface Generator)
 
+Version 1.1 Patch 5 (February 5, 1998)
+======================================
+2/4/98  : Fixed a bug in the configure script when different package
+          locations are specified (--with-tclincl, etc...).
+
+2/2/98  : Fixed name-clash bug related to the switch to C macros for accessor
+          functions.  The new scheme did not work correctly for objects
+          with members such as 'obj', 'val', etc...   Fixed the bug by
+          appending the word 'swig' to macro argument names.  Patch
+          contributed by Rudy Albachten.
+
+2/2/98  : Slight fix to the Perl5 module to eliminate warning messages
+          about 'varname used only once : possible typo'.  Fix
+          contributed by Rudy Albachten.
 
 1/9/98  : Fixed a bug in the Perl 5 module related to the creation of
           constants and shadow classes.

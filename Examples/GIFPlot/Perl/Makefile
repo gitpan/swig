@@ -3,7 +3,7 @@
 # Change the location of SWIG and Perl below
 
 CC        = gcc
-SWIG      = swig
+SWIG      = ../../../swig
 IDIR      = ../Interface
 IFILE     = gifplot.i
 ISRC      = $(IFILE:.i=_wrap.c)

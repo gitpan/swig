@@ -56,7 +56,7 @@
 
 #define SWIG_MAJOR_VERSION 1
 #define SWIG_MINOR_VERSION 1
-#define SWIG_SPIN "(Patch 4)"
+#define SWIG_SPIN "(Patch 5)"
 
 /* Global variables.   Needs to be cleaned up */
 

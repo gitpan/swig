@@ -1629,7 +1629,7 @@ void cplus_emit_member_func(char *classname, char *classtype, char *classrename,
       if (!mode) {
 	cname = "";
 	cname << iname;
-	wrap << "#define " << cname << "(obj";
+	wrap << "#define " << cname << "(_swigobj";
 
 	// Walk down the parameter list and Spit out arguments
 	
@@ -1637,7 +1637,7 @@ void cplus_emit_member_func(char *classname, char *classtype, char *classrename,
 	p = l->get_first();
 	while (p != 0) {
 	  if ((p->t->type != T_VOID) || (p->t->is_pointer)) {
-	    wrap << ",arg" << i;
+	    wrap << ",_swigarg" << i;
 	    i++;
 	  }
 	  p = l->get_next();
@@ -1646,16 +1646,16 @@ void cplus_emit_member_func(char *classname, char *classtype, char *classrename,
 	wrap << ")  (";
 	
 	if (!ObjCClass) {
-	  wrap << "obj->" << mname << "(";         // C++ invocation
+	  wrap << "_swigobj->" << mname << "(";         // C++ invocation
 	} else { 
-	  wrap << "[ obj " << mname;               // Objective C invocation 
+	  wrap << "[ _swigobj " << mname;               // Objective C invocation 
 	}
 	i = 0;
 	p = l->get_first();
 	while(p != 0) {
 	  if (ObjCClass) wrap << " " << p->objc_separator;
 	  if ((p->t->type != T_VOID) || (p->t->is_pointer)) {
-	    wrap << "arg" << i;
+	    wrap << "_swigarg" << i;
 	    i++;
 	  }
 	  p = l->get_next();
@@ -1972,13 +1972,13 @@ void cplus_emit_destructor(char *classname, char *classtype, char *classrename,
     
     if (!mode) {
       // Spit out a helper function for this member function
-      wrap << "#define " << cname << "(obj) (";
+      wrap << "#define " << cname << "(_swigobj) (";
       if (ObjCClass) {
-	wrap << "[obj " << mname << "])\n";   // Name of the member is the destructor
+	wrap << "[_swigobj " << mname << "])\n";   // Name of the member is the destructor
       } else if (CPlusPlus) 
-	wrap << "delete obj)\n";
+	wrap << "delete _swigobj)\n";
       else
-	wrap << "free ((char *) obj))\n";
+	wrap << "free ((char *) _swigobj))\n";
       fprintf(f_wrappers,"%s", wrap.get());
     } else {
       if (ccode) {
@@ -2087,12 +2087,12 @@ void cplus_emit_constructor(char *classname, char *classtype, char *classrename,
       while (p != 0) {
 	if (ObjCClass) fcall << " " <<  p->objc_separator;
 	if ((p->t->type != T_VOID) || (p->t->is_pointer)) {
-	  wrap << "arg" << i;
+	  wrap << "_swigarg" << i;
 
 	  // Emit an argument in the function call if in C++ mode
 	  
 	  if ((CPlusPlus) || (ObjCClass)) {
-	    fcall << "arg" << i;
+	    fcall << "_swigarg" << i;
 	  }
 	}
 	i++;
@@ -2268,8 +2268,8 @@ void cplus_emit_variable_get(char *classname, char *classtype, char *classrename
 		 << tab4 << "return result;\n"
 		 << "}\n";
 	  } else {
-	    wrap << "#define " << cname << "(obj) "
-		 << "(&obj->" << mname << ")\n";
+	    wrap << "#define " << cname << "(_swigobj) "
+		 << "(&_swigobj->" << mname << ")\n";
 	  }
 	  type->is_pointer--;
 	} else {
@@ -2281,11 +2281,11 @@ void cplus_emit_variable_get(char *classname, char *classtype, char *classrename
 		 << tab4 << "return result;\n"
 		 << "}\n";
 	  } else {
-	    wrap << "#define " << cname << "(obj) (";
+	    wrap << "#define " << cname << "(_swigobj) (";
 	    if (!type->is_reference) wrap << type->print_cast();
 	    else
 	      wrap << "&";
-	    wrap << " obj->" << mname << ")\n";
+	    wrap << " _swigobj->" << mname << ")\n";
 	  }
 	}
 	fprintf(f_wrappers,"%s",wrap.get());
@@ -2457,17 +2457,17 @@ void cplus_emit_variable_set(char *classname, char *classtype, char *classrename
 	  if ((type->type != T_VOID) || (type->is_pointer)){
 	    if (!type->is_pointer) {
 
-	      wrap << "#define " << cname << "(obj,val) (";	      
+	      wrap << "#define " << cname << "(_swigobj,_swigval) (";	      
 	      // Have a real value here (ie.  not a pointer).  
 	      // If it's a user defined type, we'll do something special.
 	      // Otherwise, just assign it.
 	      
 	      if (type->type != T_USER) {
-		wrap << "obj->" << mname << " = val";
+		wrap << "_swigobj->" << mname << " = _swigval";
 	      } else {
-		wrap << "obj->" << mname << " = *(val)";
+		wrap << "_swigobj->" << mname << " = *(_swigval)";
 	      }
-	      wrap << ",val)\n";
+	      wrap << ",_swigval)\n";
 	    } else {
 	      // Is a pointer type here.  If string, we do something
 	      // special.  Otherwise. No problem.
@@ -2489,11 +2489,11 @@ void cplus_emit_variable_set(char *classname, char *classtype, char *classrename
 		wrap << "}\n";
 	      } else {
 		// A normal pointer type of some sort
-		wrap << "#define " << cname << "(obj,val) (";
+		wrap << "#define " << cname << "(_swigobj,_swigval) (";
 		if (type->is_reference) {
-		  wrap << "obj->" << mname << " = *val, val)\n";
+		  wrap << "_swigobj->" << mname << " = *_swigval, _swigval)\n";
 		} else {
-		  wrap << "obj->" << mname << " = val,val)\n";
+		  wrap << "_swigobj->" << mname << " = _swigval,_swigval)\n";
 		}
 	      }
 	    }

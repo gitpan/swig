@@ -31,7 +31,7 @@ WRAPOBJ       = $(INTERFACE:.i=_wrap.o)
 TARGET        = module.so # Use this kind of target for dynamic loading
 #TARGET        = my_tclsh  # Use this target for static linking
 
-prefix        = /home/beazley/Packages
+prefix        = /home/beazley/scratch
 exec_prefix   = ${prefix}
 
 CC            = gcc
@@ -81,7 +81,7 @@ XINCLUDE      = -I/usr/X11R6/include
 
 # Tcl installation (where is Tcl/Tk located)
 
-TCL_INCLUDE   = -I/home/beazley/Packages/include
+TCL_INCLUDE   = -I/usr/local/include
 TCL_LIB       = -L/usr/local/lib
 
 # Build libraries (needed for static builds)

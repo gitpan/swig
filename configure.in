@@ -260,9 +260,9 @@ TCLPACKAGE=nope
 AC_ARG_WITH(tcl,[  --with-tcl=path         Set location of Tcl package],[
 	TCLPACKAGE="$withval"], [TCLPACKAGE=nope])
 AC_ARG_WITH(tclincl,[  --with-tclincl=path     Set location of Tcl include directory],[
-	TCLINCLUDE="$withval"], [TCLINCLUDE=nope])
+	TCLINCLUDE="-I$withval"], [TCLINCLUDE=nope])
 AC_ARG_WITH(tcllib,[  --with-tcllib=path      Set location of Tcl library directory],[
-	TCLLIB="$withval"], [TCLLIB=nope])
+	TCLLIB="-L$withval"], [TCLLIB=nope])
 
 if test "$TCLINCLUDE" = nope; then
    if test "$TCLPACKAGE" != nope; then
@@ -329,9 +329,9 @@ ITCLPACKAGE=nope
 AC_ARG_WITH(itcl,[  --with-itcl=path        Set location of itcl package],[
 	ITCLPACKAGE="$withval"], [ITCLPACKAGE=nope])
 AC_ARG_WITH(itclincl,[  --with-itclincl=path    Set location of itcl include directory],[
-	ITCLINCLUDE="$withval"], [ITCLINCLUDE=nope])
+	ITCLINCLUDE="-I$withval"], [ITCLINCLUDE=nope])
 AC_ARG_WITH(itcllib,[  --with-itcllib=path     Set location of itcl library directory],[
-	ITCLLIB="$withval"], [ITCLLIB=nope])
+	ITCLLIB="-L$withval"], [ITCLLIB=nope])
 
 if test "$ITCLINCLUDE" = nope; then
    if test "$ITCLPACKAGE" != nope; then
