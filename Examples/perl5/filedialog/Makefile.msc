@@ -1,0 +1,7 @@
+SRCS      = file.cxx
+INTERFACE = FileSelect.i
+WRAPFILE  = FileSelect_wrap.cxx
+TARGET    = FileSelect.dll
+
+!include ..\..\..\Makefile.win
+

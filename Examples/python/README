@@ -1,0 +1,38 @@
+	
+This directory contains examples for Python
+
+All of these examples use the file Makefile.template in the top level
+directory. You may need to edit this file by hand if it is incorrect.
+
+If you are using dynamic loading, you can build each example by typing
+'make'.  If your machine does not support dynamic loading, you can
+type 'make static' which will rebuild the Python interpreter with the
+SWIG module added to it.  Static builds rely upon the file 'embed.i'
+in the SWIG library.  By default, this file assumes Python 1.5.  If
+you are using Python 1.3 or Python1.4, go to the SWIG library and
+rename the file embed13.i or embed14.i to 'embed.i'.
+
+For some C++ examples, you may need to use 'make static' as dynamic
+loading of C++ modules is not supported equally on all machines.
+
+For static rebuilds, you may need to add the Tcl libraries to the link
+line if your installed version of Python has been compiled with the
+tkinter module.
+
+
+---- Recent Testing Information ---
+
+All of the Python examples have been tested on the following dates.
+
+Date checked : January 3, 1998
+Versions     : Python 1.5
+OS           : Linux 2.0.27
+
+
+Date checked : June 22, 1997
+Versions     : Python 1.3, 1.4, 1.5a2
+OS           : Linux 2.0.27, Irix 6.2, MkLinux DR2.1
+               Windows NT 4.0.
+
+              
+

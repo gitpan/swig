@@ -1,0 +1,12 @@
+These examples show how typemaps can be used to remap various
+SWIG datatypes.
+
+argv          - How to pass Tcl lists as char **
+constants     - Remap integer constants with a hash table.
+return        - Return function arguments
+interp        - Pass the Tcl_Interp * value into a C function
+
+These examples only work with Tcl 7.x at this time.   The same
+principles can be applied to Tcl 8.x, but this will require 
+more time to learn all of the details of the new Tcl object
+interface.

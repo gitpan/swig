@@ -1,0 +1,1316 @@
+<html>
+<title> GIFPlot 0.0 </title>
+<body bgcolor="#ffffff">
+
+<h1> GIFPlot 0.0 </h1>
+<img src="gp.gif" align="right" width=200 height=200>
+<b> Dave Beazley <br> <br>
+Theoretical Division (T-11) <br>
+Los Alamos National Laboratory </br>
+Los Alamos, New Mexico  87545 <br>
+<tt>beazley@lanl.gov </tt> <br>
+<p>
+September 14, 1996
+</b>
+
+<p>
+<em> Disclaimer : This is pre-release software and this is the 
+only documentation.    Use at your own peril.
+</em>
+
+<h2> 1. Introduction </h2>
+
+GIFPlot is a simple graphics library I have developed for 
+creating images in scientific computing applications.  The
+library itself consists of about 90 functions and is a stand-alone
+package that can be directly integrated with C/C++ applications.
+It is currently used for imaging of 100 million atom simulations
+in the SPaSM code at Los Alamos National Laboratory.
+
+<h3> 1.1. Features </h3>
+
+<ul>
+<li> Memory efficient (uses only 8-bit graphics).
+<li> High performance.
+<li> Contains basic graphics primitives for 2D and 3D images.
+<li> Z-buffered 3D imaging.
+<li> Does not rely on any special purpose libraries and does not use X11.   
+<li> Written in ANSI C and compiles on any machine.
+<li> Can be easily parallelized.
+<li> Produces compact GIF images as output.  
+</ul>
+
+<h3> 1.2. History </h3>
+
+GIFPlot is roughly based on a graphics library
+written in 8086 assembler code that I developed in 1990 for the A-6
+group at LANL.  Many of the basic primitives are taken directly out of
+that code.  Most of the 3D algorithms are recent additions. 
+
+<h3> 1.3. Philosophy </h3>
+
+GIFPlot is primarily designed to be a simple set of graphics
+primitives that you can use to build images.  It is not a data 
+visualization package.   In other words, you can't just give it
+an array of floats and have it make a graph.  Rather you should think
+of GIFPlot as a library in which you could write your own C function
+to do that.
+
+<hr>
+<h2> 2. The 30 second user's guide. </h2>
+
+GIFPlot is used as C library.    Here's a simple program that uses it :
+
+<blockquote> <tt> <pre>
+
+#include "gifplot.h"
+int main(int argc, char **argv) {
+
+    FrameBuffer *f;
+    ColorMap    *cm;
+
+    /* Create a framebuffer */
+
+    f = new_FrameBuffer(300,300);
+
+    /* Load a colormap */
+
+    cm = new_ColorMap(0);
+
+    /* Create a new 2D image */
+
+    FrameBuffer_clear(f,BLACK);
+    FrameBuffer_solidbox(f,50,50,250,250,BLUE);
+    FrameBuffer_drawstring(f,105,150,WHITE,BLUE,"HELLO WORLD",HORIZONTAL);
+    FrameBuffer_writeGIF(f,cm,"plot.gif");
+}
+</pre> </tt> </blockquote>
+
+To compile, simply do something like the following :
+<blockquote> <pre>
+gcc hello.c -I/usr/local/include -L/usr/local/lib -lgifplot -o hello
+</pre> </blockquote>
+
+When you run the program "hello", it will generate a file "plot.gif"
+that looks like this :
+<p><center>
+<img src="hello.gif">
+</center>
+
+<p> That's about it.   Now it's just a matter of knowing what functions
+are available and how to use them. </p>
+
+<hr>
+<h2> 3. FrameBuffers and Colormaps</h2>
+
+<h3> 3.1. FrameBuffer structure </h3>
+
+All operations in GIFPlot require the use of a framebuffer.  Framebuffers
+are defined by the following C structure :
+
+<blockquote> <pre>
+typedef struct FrameBuffer {
+  Pixel         **pixels;    /* 2D array of pixel values           */
+  Zvalue        **zbuffer;   /* zbuffer.  Used for 3D              */
+  unsigned int    height;    /* height of the framebuffer (pixels) */
+  unsigned int    width;     /* width of framebuffer (pixels)      */
+  int             xmin;      /* Clipping region                    */
+  int             ymin;
+  int             xmax;
+  int             ymax;
+} FrameBuffer;
+</pre>
+</blockquote>
+
+Frames consists of 2D arrays of Pixels and z-values for 3D images.
+The <tt> xmin,ymin,xmax,ymax </tt> parameters can be used to define
+a viewport.  (Graphics operations are clipped against the viewport).
+
+<h3> 3.2. Screen Layout </h3>
+
+The screen is organized with point (0,0) corresponding to the lower
+left corner and (width,height) corresponding to the upper right corner
+as shown.
+<center>
+<img src="frame0.gif">
+</center>
+
+<h3> 3.3. Basic Operations </h3>
+
+<b> <pre>FrameBuffer *new_FrameBuffer(unsigned int width, unsigned int height) </pre> </b>
+<blockquote>
+Creates a new framebuffer with the given dimensions.  Returns a FrameBuffer
+object.
+</blockquote>
+
+
+<b> <pre>void *delete_FrameBuffer(FrameBuffer *f) </pre> </b>
+<blockquote>
+Destroys the given FrameBuffer.
+</blockquote>
+
+<b> <pre>int FrameBuffer_resize(FrameBuffer *f, int width, int height) </pre> </b>
+<blockquote>
+Resizes a framebuffer.  Returns a -1 if the operation fails.  Usually
+this will only happen if there isn't enough memory available for the
+operation.
+</blockquote>
+
+<b> <pre>void FrameBuffer_clear(FrameBuffer *f, Pixel color) </pre> </b>
+<blockquote>
+Clears the current framebuffer to the given color.  This clears the
+entire FrameBuffer, regardless of whatever clipping parameters have
+been set.
+</blockquote>
+
+<b> <pre>void FrameBuffer_plot(FrameBuffer *f, int x, int y, Pixel color)
+</pre> </b>
+<blockquote>
+Plots a single pixel with the given color.  If the pixel falls outside
+the clipping window, it is ignored.
+</blockquote>
+
+<b> <pre>void FrameBuffer_horizontal(FrameBuffer *f, int xmin, int xmax, int y, Pixel Color) </pre> </b>
+<blockquote>
+A high performance function for drawing a horizontal line on the screen of a 
+given color.   The endpoints will be clipped if necessary.
+</blockquote>
+
+<b> <pre>
+void FrameBuffer_horizontalinterp(FrameBuffer *f, int xmin, int xmax, int y,
+                                  Pixel c1, Pixel c2) </pre> </b>
+
+<blockquote>
+Draws a horizontal line on the screen, but performs a linear interpolation of
+color values between the two endpoints.   This is used to draw colorbars
+and to perform generate smoothing effects.
+</blockquote>
+
+<b> <pre>
+void FrameBuffer_vertical(FrameBuffer *f, int ymin, int ymax, int x, Pixel color) </pre> </b>
+
+<blockquote>
+A high performance function for drawing vertical lines.  Lines are clipped
+if necessary.
+</blockquote>
+
+<b> <pre>
+void FrameBuffer_line(FrameBuffer *f, int x1, int y1, int x2, int y2, Pixel color) </pre> </b>
+<blockquote>
+Draw a line between two points.  Line endpoints will be clipped if necessary.
+</blockquote>
+
+<b> <pre>
+void FrameBuffer_box(FrameBuffer *f, int x1, int y1, int x2, int y2, Pixel color) </pre> </b>
+
+<blockquote>
+Draws an outlined box. (x1,y1) and (x2,y2) define two opposite
+corners of the box and may be specified in any order.   
+</blockquote>
+
+<b> <pre>
+void FrameBuffer_solidbox(FrameBuffer *f, int x1, int y1, int x2, int y2,
+                          Pixel color) </pre> </b>
+<blockquote>
+Draws a solid box.  (x1,y1) and (x2,y2) define two opposite corners
+of the box.
+</blockquote>
+
+<b> <pre>
+void FrameBuffer_interpbox(FrameBuffer *f, int x1, int y1, int x2, int y2,
+                           Pixel c1, Pixel c2, Pixel c3, Pixel c4) </pre> </b>
+
+<blockquote>
+Draws a box, but interpolates color values between values specified at
+the four corners.  This is commonly used to produce smoothing effects.  The
+color values are assigned as follows :
+<ul>
+<li> (x1,y1) = color c1
+<li> (x1,y2) = color c2
+<li> (x2,y1) = color c3
+<li> (x2,y2) = color c4
+</ul>
+</blockquote>
+
+<b> <pre>
+void FrameBuffer_circle(FrameBuffer *f, int x, int y, int radius, Pixel color) 
+</pre> </b>
+
+<blockquote>
+Draws an outlined circle on the screen with center (x,y) and radius specified
+in pixels.
+</blockquote>
+
+<b> <pre>
+void FrameBuffer_solidcircle(FrameBuffer *f, int x, int y, int radius, Pixel color) </pre> </b>
+
+<blockquote>
+Draws a filled circle on the screen with center (x,y) and radius specified
+in pixels.
+</blockquote>
+
+<b> <pre>
+void FrameBuffer_setclip(FrameBuffer *f, int xmin, int ymin, int xmax, int ymax) </pre> </b>
+<blockquote>
+Sets a clipping region on the current viewport.   Everything drawn will be
+clipped to fit inside this region.
+</blockquote>
+
+<b> <pre>
+void FrameBuffer_noclip(FrameBuffer *f) </pre> </b>
+<blockquote>
+Disable any clipping that might have been set.
+</blockquote>
+
+<b> <pre>
+void FrameBuffer_zclear(FrameBuffer *f) </pre> </b>
+<blockquote>
+Clears the zbuffer associated with a FrameBuffer (if any).
+</blockquote>
+
+<h3> 3.4.  Drawing Text </h3>
+
+GIFPlot has limited support for text.  A single 8 by 10 pixel font is
+currently available.   The library can draw text both horizontally
+and vertically.  Currently, only upper case letters, numerical digits,
+and a few special symbols can be drawn (I'm assuming that you're
+not going to use this library for word processing anyways).
+
+<p>
+<b> <pre>
+void FrameBuffer_drawchar(FrameBuffer *frame, int x, int y, int fgcolor,
+                          int bgcolor, char chr, int orientation) </pre> </b>
+
+<blockquote>
+Draws a single character <tt> chr </tt> on the screen at location (x,y) and
+with the given foreground and background colors.   <tt> orientation </tt>
+may be <tt> HORIZONTAL </tt> or <tt> VERTICAL.</tt>.
+</blockquote>
+
+<b> <pre>
+void FrameBuffer_drawstring(FrameBuffer *frame, int x, int y, int fgcolor,
+                            int bgcolor, char *string, int orientation) </pre> </b>
+<blockquote>
+Draws an ASCII character string on the screen starting at location (x,y)
+and with given foreground and background colors.  <tt> orientation </tt> may
+be <tt> HORIZONTAL </tt> or <tt> VERTICAL </tt>.   This function will
+wrap text to the next "line" if it is too long to fit on the current
+framebuffer.   Carriage returns are also translated
+into line breaks.  The following image shows what the different
+styles look like :
+<p>
+<center>
+<img src = "frame1.gif">
+</center>
+</blockquote>
+
+<h3> 3.5.  Pixel Maps (ie. Bitmaps) </h3>
+
+Extremely limited support is available for bit-maps.   These are primarily
+used for adding symbols to 2D plots.
+
+<p>
+<b> <pre> 
+PixMap *new_PixMap(int width, int height, int centerx, int centery) </pre> </b>
+
+<blockquote>
+This creates a new pixel map with given width and height.  The point (centerx, centery) defines the center point used when the the map is drawn on the screen.
+Returns a structure of type "PixMap".
+</blockquote>
+
+<b> <pre>
+void delete_PixMap(PixMap *p) </pre> </b>
+<blockquote>
+Destroys a PixMap.
+</blockquote>
+
+<b> <pre>
+void PixMap_set(PixMap *p, int x, int y, int value) </pre> </b>
+<blockquote>
+Sets point (x,y) in a pixel map.  value is one of the following codes :
+<ul>
+<li> <tt> FOREGROUND </tt>
+<li> <tt> BACKGROUND </tt>
+<li> <tt> TRANSPARENT </tt>
+</ul>
+By default, when a PixMap is created, all of the pixels are set to
+<tt> TRANSPARENT </tt> mode.
+</blockquote>
+
+<b> <pre>
+void FrameBuffer_drawpixmap(FrameBuffer *f, PixMap *pm, int x, int y,
+                            int fgcolor, int bgcolor) </pre> </b>
+
+<blockquote>
+Draws a pixel map on the screen at location (x,y) with the given foregroundn
+and background colors.  The following graph shows how a graph with PixMaps
+might look :
+<p>
+<center>
+<img src="frame2.gif">
+</center>
+<p> In this image, a SQUARE PixMap has been used to mark points in
+the plotting of an array.  The following PixMaps are already defined
+in the library :
+<ul>
+<li> <tt> PixMap_SQUARE </tt>
+<li> <tt> PixMAP_TRIANGLE </tt>
+<li> <tt> PixMAP_CROSS </tt>
+</ul>
+
+</blockquote>
+
+<h3> 3.6. Colormaps </h3>
+
+While none of the graphics primitives require a colormap in order to
+operate, one must be loaded into order to make a GIF image.  The
+following commands can be used to manipulate colormaps.
+
+<b> <pre>
+ColorMap *new_ColorMap(char *filename) </pre> </b>
+
+<blockquote>  This creates a new colormap.  If <tt> filename </tt> is non-NULL,
+the function will attempt to read the colormap from a file.  If <tt> filename </tt> is NULL (or 0), this will create a new colormap and return a pointer
+to it.     The first 16 colors in the colormap are reserved by the library
+and set to predefined values.   The remaining 240 colors, can be set as
+necessary. 
+<p>
+ColorMap files are 768 bytes long and contain 8-bit values corresponding
+to the red, blue, and green components of each color.   The file is
+organized as follows :
+<ul>
+<li> Bytes 0-255.  Red color components.
+<li> Bytes 256-511. Blue color components.
+<li> Bytes 512-767. Green color components.
+</ul>
+<p>
+This function returns NULL upon failure. 
+</blockquote>
+
+<b> <pre>
+void delete_ColorMap(ColorMap *c)</pre> </b>
+<blockquote>
+Destroys a colormap.
+</blockquote>
+
+<b> <pre>
+void ColorMap_default(ColorMap *c)</pre> </b>
+<blockquote>
+This initializes the first 16 elements of a colormap to the
+default values expected by the library.
+</blockquote>
+
+<b> <pre>
+void ColorMap_assign(ColorMap *c, int index, int r, int g, int b) </pre> </b>
+<blockquote>
+This assigns new red,green,and blue components to a particular
+color index.   For example, the following code would create a grey-scale
+colormap:
+<blockquote><pre>
+c = new_ColorMap(0);
+for (i = 16; i < 256; i++) 
+	ColorMap_assign(c,i,i,i,i);
+</pre>
+</blockquote>
+</blockquote>
+
+<b> <pre>
+int ColorMap_write(ColorMap *c, char *filename) </pre> </b>
+<blockquote>
+Writes a colormap out to a file for later use.  Returns -1 if
+an error occurred write writing the file.
+</blockquote>
+
+<b> Default colors </b>
+
+<p>
+The following common colors are defined and can be used by simply
+supplying one of these symbols : 
+<tt>
+<ul>
+<li> BLACK
+<li> WHITE 
+<li> RED 
+<li> BLUE
+<li> GREEN
+<li> YELLOW
+<li> CYAN
+<li> MAGENTA
+</ul>
+</tt>
+
+<h3> 3.7.  More About Clipping </h3>
+
+Clipping turns out to be critical for producing a variety of complex
+more images and is used extensively in GIFPlot applications.  The following 
+code fragment shows how it works :
+
+<blockquote>
+<pre>
+    f = new_FrameBuffer(300,300);
+    cm = new_ColorMap("cm15");
+
+    /* Create a new 2D image */
+
+    FrameBuffer_clear(f,BLUE);
+    FrameBuffer_setclip(f,0,0,200,200);
+    FrameBuffer_solidbox(f,0,0,300,300,BLACK);
+    for (i = 0; i < 400; i++) {
+	x1 = rand() % 400;
+	y1 = rand() % 400;
+	x2 = rand() % 400;
+	y2 = rand() % 400;
+	c = rand() % 256;
+	FrameBuffer_line(f,x1,y1,x2,y2,c);
+    }
+    FrameBuffer_box(f,0,0,199,199,WHITE);
+    FrameBuffer_setclip(f,175,175,300,300);
+    FrameBuffer_solidbox(f,0,0,300,300,BLACK);
+    for (i = 0; i < 100; i++) {
+	x1 = rand() % 400;
+	y1 = rand() % 400;
+	x2 = rand() % 400;
+	y2 = rand() % 400;
+	c = rand() % 256;
+	FrameBuffer_box(f,x1,y1,x2,y2,c);
+    }
+    FrameBuffer_box(f,175,175,299,299,WHITE);
+    FrameBuffer_writeGIF(f,cm,"plot.gif");
+</pre>
+</blockquote>
+
+This produces the following image, with two clipped regions :
+<p>
+<center>
+<img src="clip.gif">
+</center>
+<br>
+
+
+<hr>
+<h2> 4. Making a GIF image </h2>
+
+The following two functions are available to make GIF images.
+
+<p>
+<b> <pre>
+int FrameBuffer_writeGIF(FrameBuffer *f, ColorMap *c, char *filename)</pre></b>
+<blockquote>
+This writes a GIF image to the given filename.   You need to specify both
+the frameBuffer and corresponding colormap.  Returns -1 if a file error
+occurred or if no memory was available for the requested operation.
+Currently, there is an internal filesize limit of 512000 bytes.  This
+should be sufficient for most GIF images.  This limitation will be
+eliminated in future releases.
+</blockquote>
+
+<b> <pre>
+int FrameBuffer_makeGIF(FrameBuffer *f, ColorMap *c, void *buffer, int bufsize)</pre> </b>
+<blockquote>
+This creates a GIF image and saves it in a buffer supplied by the user.  The
+buffer must be large enough to contain the entire image or an error will
+occur (the buffer size is specified using <tt> bufsize</tt>).     Upon
+return, this function will return the size of the image in bytes or -1
+if an error occurred.   This function is primarily used to quickly create
+GIF images for transfer over socket connections and other situations
+where it may not be necessary to dump the image to a file first.
+</blockquote>
+
+<hr>
+<h2> 5. 2D Plotting Primitives </h2>
+
+To produce 2D plots, GIFPlot provides functions for drawing various
+graphics primitives in real-world coordinates.   All of the scaling
+is done in the library for you automatically.    The following data
+structure contains information about 2D plots :
+
+<blockquote> <pre>
+typedef struct Plot2D {
+  FrameBuffer    *frame;        /* Frame buffer are we using     */
+  int             view_xmin;    /* Minimum coordinates of view region */
+  int             view_ymin;    
+  int             view_xmax;    /* Maximum coordinates of view region */
+  int             view_ymax;    
+  double          xmin;         /* Minimum coordinates of plot region */
+  double          ymin;
+  double          xmax;         /* Maximum coordinates of plot region */
+  double          ymax;
+} Plot2D;
+</pre>
+</blockquote>
+
+The parameters <tt> xmin,ymin,xmax,ymax</tt> contain the real-world
+coordinates of the plot.  The parameters <tt>view_xmin,view_ymin,view_xmax,
+view_ymax</tt> contain the viewport coordinates of the image (in case
+it only takes up part of the framebuffer).
+
+<h3> 5.1. Creating a new 2D Plot </h3>
+
+<b> <pre>
+Plot2D *new_Plot2D(FrameBuffer *f, double xmin, double ymin, double xmax, double ymax)</pre></b>
+<blockquote>
+Creates a new 2D plot.   Caller must specify the framebuffer to be used
+and the minimum and maximum coordinates of the plot (real-world coordinates).
+This returns a new Plot2D structure is successful or NULL if an error
+occurred.
+</blockquote>
+
+<b><pre>
+void delete_Plot2D(Plot2D *p2)</pre></b>
+<blockquote>
+Destroys a 2D plot.
+</blockquote>
+
+<b><pre>
+Plot2D *Plot2D_copy(Plot2D *p2) </pre> </b>
+<blockquote>
+Returns a copy of all of the parameters of a given 2D plot in a new
+Plot2D structure.
+</blockquote>
+
+<h3> 5.2. 2D Primitives </h3>
+
+<b> <pre>
+void Plot2D_start(Plot2D *p2)</pre> </b>
+<blockquote>
+This function should be called before creating a new 2D image. It checks
+various parameters, make adjustments if necessary, and prepares the
+framebuffer for use (by setting up the clipping region among other things).
+</blockquote>
+
+<b> <pre>
+void Plot2D_clear(Plot2D *p2, Pixel color) </pre> </b>
+<blockquote>
+Clears the viewing region associated with a 2D plot to the given
+color.   This only clears the view-region, not the entire framebuffer.
+</blockquote>
+
+<b> <pre>
+void Plot2D_plot(Plot2D *p2, double x, double y, Pixel color) </pre></b>
+<blockquote>
+Plots a single pixel corresponding to the point (x,y).  If the point
+falls outside the plotting range, it is ignored.
+</blockquote>
+
+<b> <pre>
+void Plot2D_line(Plot2D *p2, double x1, double y1, double x2, double y2, Pixel color) </pre></b>
+<blockquote>
+Draws a line between (x1,y1) and (x2,y2).   Points may be anywhere in
+space and will be clipped to fit into the viewing region (or ignored
+if the line falls completely outside the region).
+</blockquote>
+
+<b> <pre>
+void Plot2D_box(Plot2D *p2, double x1, double y1, double x2, double y2, Pixel color) </pre></b>
+<blockquote>
+Draws an outlined box with opposite corners specified by the points
+(x1,y1) and (x2,y2).
+</blockquote>
+
+<b> <pre>
+void Plot2D_solidbox(Plot2D *p2, double x1, double y1, double x2, double y2, Pixel ccolor) </pre></b>
+<blockquote>
+Draws a solid box with opposite corners specified by the points
+(x1,y1) and (x2,y2).
+</blockquote>
+
+<b> <pre>
+void Plot2D_interpbox(Plot2D *p2, double x1, double y1, double x2, double y2,
+                      Pixel c1, Pixel c2, Pixel c3, Pixel c4) </pre></b>
+<blockquote>
+Draws a box with linear interpolation of colors between the corner
+points.   This is used to draw colorbars and to perform color smoothing
+operations.   The colors are assigned as follows :
+<ul>
+<li> (x1,y1) = color c1
+<li> (x1,y2) = color c2
+<li> (x2,y1) = color c3
+<li> (x2,y2) = color c4
+</ul>
+</blockquote>
+
+<b> <pre>
+void Plot2D_circle(Plot2D *p2, double x, double y, double radius, Pixel color)</pre></b>
+<blockquote>
+Draws an outlined circle at point (x,y) with the given radius.
+</blockquote>
+
+<b> <pre>
+void Plot2D_solidcircle(Plot2D *p2, double x, double y, double radius, Pixel color)</pre></b>
+<blockquote>
+Draws an solid circle at point (x,y) with the given radius.
+</blockquote>
+
+<b> <pre>
+void Plot2D_drawpixmap(Plot2D *p2, PixMap *pm, double x, double y,
+                       Pixel fgcolor, Pixel bgcolor) </pre></b>
+<blockquote>
+Draws a pixel map at the given location with specified foreground and
+background colors.   This is primarily used to put symbols on 2D plots.
+</blockquote>
+
+<b><pre>
+void Plot2D_xaxis(Plot2D *p2, double x, double y, double xtick, int ticklength, Pixel color)</pre></b>
+<blockquote>
+Draws an x-axis on the image with origin (x,y).  Ticks are placed every
+<tt> xtick </tt> units and have a width of <tt> ticklength </tt> pixels.
+</blockquote>
+
+<b><pre>
+void Plot2D_yaxis(Plot2D *p2, double x, double y, double ytick, int ticklength, Pixel color)</pre></b>
+<blockquote>
+Draws an y-axis on the image with origin (x,y).  Ticks are placed every
+<tt> ytick </tt> units and have a width of <tt> ticklength </tt> pixels.
+</blockquote>
+
+<b> <pre>
+void Plot2D_setview(Plot2D *p2, int vxmin, int vymin, int vxmax, int vymax)</pre> </b>
+<blockquote>
+Set the viewport for a 2D plot.
+</blockquote>
+
+<b> <pre>
+void Plot2D_setrange(Plot2D *p2, double xmin, double ymin, double xmax, double ymax) </pre></b>
+<blockquote>
+Sets the plotting range of a 2D plot.
+</blockquote>
+
+<h3> 5.3. Example 2D Plot </h3>
+
+The following code shows an example 2D plot, by plotting the
+sin(x) function.
+
+<blockquote> <pre>
+#include "gifplot.h"
+#include &lt;math.h&gt;
+
+int main(int argc, char **argv) {
+
+    FrameBuffer *f;
+    Plot2D      *p2;
+    ColorMap    *cm;
+
+    double      x1,x2,y1,y2;
+    double      dx;
+
+    f = new_FrameBuffer(600,600);
+    cm = new_ColorMap("cm15");
+
+    /* Create a new 2D image */
+
+    p2 = new_Plot2D(f,-6.3,-1.5,6.3,1.5);
+
+    /* Set viewing region in 2D plot */
+    
+    Plot2D_setview(p2,50,50,550,550);
+    
+    /* Now make a plot of the sin() function */
+
+    FrameBuffer_clear(f,BLACK);
+    FrameBuffer_noclip(f);
+    FrameBuffer_box(f,50,50,550,550,WHITE);
+    FrameBuffer_drawstring(f,290,555,YELLOW,BLACK,"sin(x)",HORIZONTAL);
+
+    Plot2D_start(p2);   /* Always call this prior to making an image */
+    Plot2D_xaxis(p2,0,0,3.14159/4.0,4, WHITE);
+    Plot2D_yaxis(p2,0,0,0.25,4, WHITE);
+    
+    x1 = -6.3;
+    y1 = sin(x1);
+    dx = 0.05;
+    while (x1 < 6.3) {
+	x2 = x1+dx;
+	y2 = sin(x2);
+	Plot2D_line(p2,x1,y1,x2,y2,YELLOW);
+	x1 = x2;
+	y1 = y2;
+    }
+
+    /* Make a GIF file */
+    FrameBuffer_writeGIF(f,cm,"plot.gif");
+}
+</pre>
+</blockquote>
+
+When executed, you will get the following image :
+<p>
+<center>
+<img src="plot2d.gif">
+</center>
+<br>
+
+<hr>
+<h2> 6. 3D Graphics </h2>
+
+GIFPlot provides support for simple 3D graphics operations.  The
+library uses a z-buffer algorithm for handling the depth information
+in an image.   While this consumes a little more memory, it is
+easy to implement, and makes it possible to parallelize visualization
+operations.
+<p>
+3D graphics is a complicated business---especially if you try to handle
+it in full generality.    My approach is to try and simplify the
+setup and management of 3D graphs as much as possible.    Thus, you
+will find the implementation here to be much different than that used
+in a system like OpenGL. 
+
+<h3> 6.1.  Creating a 3D Image </h3>
+
+3D Image parameters are stored in a structure "Plot3D" which has
+the following publically accessible fields.
+<blockquote> <pre>
+
+typedef struct Plot3D {
+  FrameBuffer   *frame;      /* Frame buffer being used */
+  int            view_xmin;  /* Viewing region */
+  int            view_ymin;
+  int            view_xmax;
+  int            view_ymax;
+  double         xmin;       /* Bounding box */
+  double         ymin;
+  double         zmin;
+  double         xmax;
+  double         ymax;
+  double         zmax;
+  double         xcenter;    /* Center point */
+  double         ycenter;
+  double         zcenter;
+  double         fovy;       /* Field of view */
+  double         znear;      /* near "clipping" plane */
+  double         zfar;       /* far "clipping" plane */
+  double         lookatz;    /* Where is the z-lookat point */
+} Plot3D;
+</pre> </blockquote>
+
+To create a new 3D image, use the following functions :
+
+<p>
+<b> <pre>
+Plot3D *new_Plot3D(FrameBuffer *frame, double xmin, double ymin, double zmin,
+                   double xmax, double ymax, double zmax) </pre></b>
+<blockquote>
+Creates a new 3D image.  The min and max ranges define a computational domain
+where the model being viewed is to be located.   The center of this region
+will be taken to be the origin of all 3D plotting.
+</blockquote>
+
+<b> <pre>
+void delete_Plot3D(Plot3D *p3) </pre> </b>
+<blockquote>
+Destroy a 3D image
+</blockquote>
+
+<b> <pre>
+Plot3D *Plot3D_copy(Plot3D *p3) </pre> </b>
+<blockquote>
+Makes a copy of a 3D image structure.
+</blockquote>
+
+<h3> 6.2.  Setting Up a 3D View </h3>
+
+GIFPlot uses a somewhat simplified 3D viewing technique as shown
+below.
+<p>
+<center>
+<img src="view3d.gif">
+</center>
+<p>
+The viewer is situated on the positive Z axis and always looks towards 
+the origin (in the negative-z direction).    The center of the object
+being viewed is translated so that the model is situated at the origin.
+The <tt> fov </tt> parameter defines a "field of view" angle for the
+viewer.  This determines how much of the model you can see on
+the screen with a narrow field of view being an extreme close-up and
+a wide field of view producing a fish-eye type effect.   The <tt> lookat </tt>
+parameter defines the distance between the viewer and the origin.
+<tt> znear </tt> and <tt> zfar </tt> define the distances from the viewer
+of near and close clipping planes for the perspective transformation.
+Normally, you don't need to set these, although you can if you want.
+
+<p> The following commands can be used to set the viewpoint
+<p>
+<b> <pre>
+void Plot3D_lookat(Plot3D *p3, double zlookat) </pre> </b>
+<blockquote>
+This sets the distance between the viewer and the center of the
+model being viewer (the origin).   This should be called before
+calling any of the perspective operations.
+</blockquote>
+
+<b> <pre>
+void Plot3D_perspective(Plot3D *p3, double fov, double znear, double zfar) </pre> </b>
+<blockquote>
+This sets up the perspective view.  <tt> fov </tt> determines the field of view (in degrees).
+while <tt> znear </tt> and <tt> zfar </tt> set the near and far clipping planes.  
+</blockquote>
+
+<b> <pre>
+void Plot3D_autoperspective(Plot3D *p3, double fovy) </pre> </b>
+<blockquote>
+This is a shorter version of <tt> perspective() </tt> that automatically
+tries to set the near and far clipping planes for you.  <tt> fov </tt>
+sets the field of view (in degrees).
+</blockquote>
+
+The following sample draws a unit cube and shows how you can set up a
+view :
+
+<blockquote> <pre>
+#include "gifplot.h"
+
+int main(int argc, char **argv) {
+
+    FrameBuffer *f;
+    Plot3D      *p3;
+    ColorMap    *cm;
+
+    /* Create a framebuffer */
+
+    f = new_FrameBuffer(300,300);
+
+    /* Load a colormap */
+
+    cm = new_ColorMap(0);
+
+    /* Create a new 3D image */
+
+    FrameBuffer_clear(f,BLACK);
+    p3 = new_Plot3D(f,0,0,0,1,1,1);
+
+    Plot3D_lookat(p3,5);
+    Plot3D_autoperspective(p3,40);
+    
+    Plot3D_start(p3);   
+    Plot3D_clear(p3,BLACK);
+    Plot3D_line(p3,0,0,0,0,0,1,WHITE);
+    Plot3D_line(p3,0,1,0,0,1,1,WHITE);
+    Plot3D_line(p3,1,0,0,1,0,1,WHITE);
+    Plot3D_line(p3,1,1,0,1,1,1,WHITE);
+    Plot3D_line(p3,0,0,0,1,0,0,WHITE);
+    Plot3D_line(p3,0,0,1,1,0,1,WHITE);
+    Plot3D_line(p3,0,1,0,1,1,0,WHITE);
+    Plot3D_line(p3,0,1,1,1,1,1,WHITE);
+    Plot3D_line(p3,0,0,0,0,1,0,WHITE);
+    Plot3D_line(p3,1,0,0,1,1,0,WHITE);
+    Plot3D_line(p3,0,0,1,0,1,1,WHITE);
+    Plot3D_line(p3,1,0,1,1,1,1,WHITE);
+    
+    /* Make a GIF file */
+
+    FrameBuffer_writeGIF(f,cm,"plot.gif");
+}
+</pre> </blockquote>
+
+This produces the following image file :
+<p>
+<center>
+<img src="view3d_2.gif">
+</center>
+<p>
+
+<h3> 6.3.  Viewing Transformations </h3>
+The following commands are used to change the view of an image.
+They are primarily designed to be easy to use by a human
+operator when the graphics system is run in an interactive
+command mode.  
+
+<p>
+<b> <pre>
+void Plot3D_rotx(Plot3D *p3, double deg)
+void Plot3D_roty(Plot3D *p3, double deg)
+void Plot3D_rotz(Plot3D *p3, double deg)
+void Plot3D_rotr(Plot3D *p3, double deg)
+void Plot3D_rotl(Plot3D *p3, double deg)
+void Plot3D_rotu(Plot3D *p3, double deg)
+void Plot3D_rotd(Plot3D *p3, double deg)
+void Plot3D_rotc(Plot3D *p3, double deg)
+</pre> </b>
+
+<blockquote>
+These functions can rotate the model around its real X,Y,Z axis or
+relative to the viewer (right, left, up, down, or around the center point).
+Normally, they are used when the graphics are used interactively, but they
+can also be used when setting up a view.   For example :
+
+<blockquote> <pre>
+    Plot3D_lookat(p3,5);
+    Plot3D_autoperspective(p3,40);
+    Plot3D_rotz(p3,45);
+    Plot3D_rotr(p3,40);		
+    
+    Plot3D_start(p3);   
+    Plot3D_clear(p3,BLACK);
+    Plot3D_line(p3,0,0,0,0,0,1,WHITE);
+    Plot3D_line(p3,0,1,0,0,1,1,WHITE);
+    Plot3D_line(p3,1,0,0,1,0,1,WHITE);
+    Plot3D_line(p3,1,1,0,1,1,1,WHITE);
+    Plot3D_line(p3,0,0,0,1,0,0,WHITE);
+    Plot3D_line(p3,0,0,1,1,0,1,WHITE);
+    Plot3D_line(p3,0,1,0,1,1,0,WHITE);
+    Plot3D_line(p3,0,1,1,1,1,1,WHITE);
+    Plot3D_line(p3,0,0,0,0,1,0,WHITE);
+    Plot3D_line(p3,1,0,0,1,1,0,WHITE);
+    Plot3D_line(p3,0,0,1,0,1,1,WHITE);
+    Plot3D_line(p3,1,0,1,1,1,1,WHITE);
+</pre> </blockquote>
+
+Will produce the following :
+<p>
+<center>
+<img src="view3d_3.gif">
+</center>
+<br>
+</blockquote>
+
+<b> <pre>
+void Plot3D_left(Plot3D *p3, double percent)
+void Plot3D_right(Plot3D *p3, double percent)
+void Plot3D_up(Plot3D *p3, double percent)
+void Plot3D_down(Plot3D *p3, double percent)
+</pre> </b>
+<blockquote>
+These shift the image around on the framebuffer.  <tt> percent </tt>
+defines a distance in terms of percentage of the current view. A
+value of 50 corresponds to half a screen, while a value of 100 is a full
+screen.  For example :
+
+<blockquote> <pre>
+    Plot3D_lookat(p3,5);
+    Plot3D_autoperspective(p3,40);
+    Plot3D_rotz(p3,45);
+    Plot3D_rotr(p3,40);		
+    Plot3D_right(p3,50);
+	    
+    Plot3D_start(p3);   
+    Plot3D_clear(p3,BLACK);
+    ...
+</pre> </blockquote>
+
+Produces the previous image shifted to the right by half a screen :
+<p>
+<center>
+<img src="view3d_4.gif">
+</center>
+</blockquote>
+
+<b> <pre>
+void Plot3D_center(Plot3D *p3, double cx, double cy) </pre>
+</b>
+<blockquote>
+This changes the center of an image to a specified point.  The
+point (cx,cy) should be in the range 0-100 where the point
+(0,0) corresponds to the lower left corner, (50,50) the center
+of the screen, and (100,100) the upper right corner of the screen.
+This command is almost always issued from an interactive program
+to recenter an image with a high-degree of accuracy.
+For example :
+<blockquote> <pre>
+    Plot3D_lookat(p3,5);
+    Plot3D_autoperspective(p3,40);
+    Plot3D_rotz(p3,45);
+    Plot3D_rotr(p3,40);		
+    Plot3D_center(p3,25,25);
+	    
+    Plot3D_start(p3);   
+    Plot3D_clear(p3,BLACK);
+    ...
+</pre> </blockquote>
+
+Produces the earlier image, but with the center of the screen now
+set to a point in the lower left corner of the original image.
+<p>
+<center>
+<img src="view3d_5.gif">
+</center>
+</blockquote>
+
+<b> <pre>
+void Plot3D_zoom(Plot3D *p3, percent)</pre></b>
+<blockquote>
+This zooms an image in or out by a given percent.  The command works
+like a copy-machine.  A percent of 100 keeps the image the same
+size.  A percent of 200 doubles the size of the image, while a 
+percent of 50 cuts the image size in half.   For example :
+<blockquote> <pre>
+    Plot3D_lookat(p3,5);
+    Plot3D_autoperspective(p3,40);
+    Plot3D_rotz(p3,45);
+    Plot3D_rotr(p3,40);		
+    Plot3D_zoom(p3,200);
+	    
+    Plot3D_start(p3);   
+    Plot3D_clear(p3,BLACK);
+    ...
+</pre> </blockquote>
+<p>
+<center>
+<img src="view3d_6.gif">
+</center>
+</blockquote>
+
+<h3> 6.4. Primitives </h3>
+
+<b><pre>
+void Plot3D_start(Plot3D *p3)</pre> </b>
+<blockquote>
+This should be called before starting to make a new 3D image. It sets
+up various parameters and makes sure everything is set up right
+before proceeding.
+</blockquote>
+
+<b><pre>
+void Plot3D_clear(Plot3D *p3, Pixel color) </pre></b>
+<blockquote>
+Clears the viewing region assigned to a 3D image.
+</blockquote>
+
+<b><pre>
+void Plot3D_plot(Plot3D *p3, double x, double y, double z, Pixel color) </pre></b>
+<blockquote>
+Plots a single point in 3D.
+</blockquote>
+
+<b><pre>
+void Plot3D_line(Plot3D *p3, double x1, double y1, double z1,
+                 double x2, double y2, double z2, Pixel color) </pre> </b>
+<blockquote>
+Draws a line between two arbitrary points (x1,y1,z1) and (x2,y2,z2).
+</blockquote>
+
+<b> <pre>
+void Plot3D_triangle(Plot3D *p3, double x1, double y1, double z1,
+                     double x2, double y2, double z2,
+                     double x3, double y3, double z3, Pixel color) </pre> </b>
+<blockquote>
+This draws an outlined 3D triangle given three points.  This can be used
+to generate wire-frame type plots.
+</blockquote>
+
+<b> <pre>
+void Plot3D_solidtriangle(Plot3D *p3, double x1, double y1, double z1,
+                          double x2, double y2, double z2,
+                          double x3, double y3, double z3, Pixel color) </pre> </b>
+<blockquote>
+This generates a solid 3D triangle given three points.   
+</blockquote>
+
+<b> <pre>
+void Plot3D_interptriangle(Plot3D *p3, double x1, double y1, double z1, Pixel c1,
+                           double x2, double y2, double z2, Pixel c2,
+                           double x3, double y3, double z3, Pixel c3) </pre> </b>
+<blockquote>
+This produces a filled triangle with color values that are interpolated
+between the three points.  This is used to produce smoothing effects
+and pseudo-lighting effects.
+</blockquote>
+
+<b> <pre>
+void Plot3D_quad(Plot3D *p3,
+                 double x1, double y1, double z1, 
+		 double x2, double y2, double z2,
+	         double x3, double y3, double z3,
+                 double x4, double y4, double z4, Pixel color) </pre> </b>
+<blockquote>
+Make a 3D outlined "quadralateral" from four points.   Primarily used
+to make 3D plots from data on rectangular meshes.
+</blockquote>
+
+<b> <pre>
+void Plot3D_solidquad(Plot3D *p3,
+                      double x1, double y1, double z1, 
+		      double x2, double y2, double z2,
+	              double x3, double y3, double z3,
+                      double x4, double y4, double z4, Pixel color) </pre> </b>
+<blockquote>
+Make a 3D solid "quadralateral" from four points.   Primarily used
+to make 3D plots from data on rectangular meshes.
+</blockquote>
+
+<b> <pre>
+void Plot3D_interpquad(Plot3D *p3,
+                       double x1, double y1, double z1, Pixel c1,
+		       double x2, double y2, double z2, Pixel c2,
+	               double x3, double y3, double z3, Pixel c3,
+                       double x4, double y4, double z4, Pixel c4) </pre> </b>
+<blockquote>
+Make a 3D quadralateral from four points and perform color interpolation.
+This is used for smoothing effects.
+</blockquote>
+
+<b> <pre>
+void Plot3D_outlinesphere(Plot3D *p3, double x, double y, double z, double radius,
+                          Pixel c, Pixel bc); </pre> </b>
+<blockquote>
+Make an outlined sphere at point (x,y,z) with given radius.  <tt> c </tt>
+is the primary sphere color while <tt> bc </tt> is the boundary
+color (the outline color).
+</blockquote>
+
+<b> <pre>
+void Plot3D_solidsphere(Plot3D *p3, double x, double y, double z, double radius,
+                        Pixel c) </pre> </b>
+<blockquote>
+Make a solid sphere at point (x,y,z) with given radius and color.
+</blockquote>
+
+<b> <pre>
+void Plot3D_setview(Plot3D *p3, int vxmin, int vymin, int vxmax, int vymax) </pre> </b>
+<blockquote>
+Set the viewing region for the plot.
+</blockquote>
+
+<h3> 6.5. Example 3D Plot </h3>
+
+The following code generates a 3D plot.
+
+<blockquote> <pre>
+#include "gifplot.h"
+#include &lt;math.h&gt;
+
+double func(double x, double y) {
+    double r;
+    double f;
+    r = sqrt(x*x + y*y);
+    f = (sin(0.30*r*x)+cos(0.30*r*y))/(1.0+r);
+    return f;
+}
+
+int main(int argc, char **argv) {
+
+    FrameBuffer *f;
+    Plot3D      *p3;
+    ColorMap    *cm;
+
+    double      x,y;
+    double      dx,dy;
+    double      z1,z2,z3,z4;
+    
+    f = new_FrameBuffer(600,600);
+    cm = new_ColorMap("cm15");
+
+    p3 = new_Plot3D(f,-6.3,-6.3,-1.5,6.3,6.3,1.5);
+    Plot3D_setview(p3,50,50,550,550);
+    Plot3D_lookat(p3,20);
+    Plot3D_autoperspective(p3,40);
+    
+    /* Now make a plot of a 3D function */
+
+    FrameBuffer_clear(f,BLACK);
+    FrameBuffer_noclip(f);
+    FrameBuffer_box(f,49,49,550,550,WHITE);
+    Plot3D_start(p3);   /* Always call this prior to making an image */
+    Plot3D_clear(p3,BLACK);
+    Plot3D_rotu(p3,60);
+    Plot3D_rotz(p3,40);
+    x = -6.3;
+    dx = 0.25;
+    while (x &lt; 6.3) {
+	y = -6.3;
+	dy = 0.25;
+	while (y &lt; 6.3) {
+	    z1 = func(x,y);
+	    z2 = func(x+dx,y);
+	    z3 = func(x+dx,y+dy);
+	    z4 = func(x,y+dy);
+	    Plot3D_quad(p3,x,y,z1,x+dx,y,z2,x+dx,y+dy,z3,x,y+dy,z4,YELLOW);
+	    y = y + dy;
+	}
+	x = x + dx;
+    }
+    /* Make a GIF file */
+    FrameBuffer_writeGIF(f,cm,"plot.gif");
+}
+</pre> </blockquote>
+<center>
+<img src="plot3d_1.gif">
+</center>
+<p>
+
+Here is a plot using <tt> Plot3D_solidquad() </tt> 
+<p>
+<center>
+<img src="plot3d_2.gif">
+</center>
+<p>
+
+Finally, here is a plot using <tt> Plot3D_interpquad() </tt>
+<p>
+<center>
+<img src="plot3d_3.gif">
+</center>
+<p>
+
+
+<hr>
+
+<pre>
+GIFPlot 0.0
+ 
+Dave Beazley
+ 
+Department of Computer Science        Theoretical Division (T-11)        
+University of Utah                    Los Alamos National Laboratory     
+Salt Lake City, Utah 84112            Los Alamos, New Mexico  87545      
+beazley@cs.utah.edu                   beazley@lanl.gov                   
+
+Copyright (c) 1996
+The Regents of the University of California and the University of Utah
+All Rights Reserved
+
+Permission is hereby granted, without written agreement and without
+license or royalty fees, to use, copy, modify, and distribute this
+software and its documentation for any purpose, provided that 
+(1) The above copyright notice and the following two paragraphs
+appear in all copies of the source code and (2) redistributions
+including binaries reproduces these notices in the supporting
+documentation.   Substantial modifications to this software may be
+copyrighted by their authors and need not follow the licensing terms
+described here, provided that the new terms are clearly indicated in
+all files where they apply.
+
+IN NO EVENT SHALL THE AUTHOR, THE UNIVERSITY OF CALIFORNIA, THE 
+UNIVERSITY OF UTAH OR DISTRIBUTORS OF THIS SOFTWARE BE LIABLE TO ANY
+PARTY FOR DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL
+DAMAGES ARISING OUT OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION,
+EVEN IF THE AUTHORS OR ANY OF THE ABOVE PARTIES HAVE BEEN ADVISED OF
+THE POSSIBILITY OF SUCH DAMAGE.
+
+THE AUTHOR, THE UNIVERSITY OF CALIFORNIA, AND THE UNIVERSITY OF UTAH
+SPECIFICALLY DISCLAIM ANY WARRANTIES,INCLUDING, BUT NOT LIMITED TO, 
+THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+PURPOSE. THE SOFTWARE PROVIDED HEREUNDER IS ON AN "AS IS" BASIS, AND 
+THE AUTHORS AND DISTRIBUTORS HAVE NO OBLIGATION TO PROVIDE MAINTENANCE,
+SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
+</pre>
+	    
+
+The GIF encoding algorithm is used under the following copyright.
+
+<pre>
+/*****************************************************************
+ * Portions of this code Copyright (C) 1989 by Michael Mauldin.
+ * Permission is granted to use this file in whole or in
+ * part for any purpose, educational, recreational or commercial,
+ * provided that this copyright notice is retained unchanged.
+ * This software is available to all free of charge by anonymous
+ * FTP and in the UUNET archives.
+ *
+ *
+ * Authors:  Michael Mauldin (mlm@cs.cmu.edu)
+ *           David Rowley (mgardi@watdcsu.waterloo.edu)
+ *
+ * Based on: compress.c - File compression ala IEEE Computer, June 1984.
+ *
+ *	Spencer W. Thomas       (decvax!harpo!utah-cs!utah-gr!thomas)
+ *	Jim McKie               (decvax!mcvax!jim)
+ *	Steve Davies            (decvax!vax135!petsd!peora!srd)
+ *	Ken Turkowski           (decvax!decwrl!turtlevax!ken)
+ *	James A. Woods          (decvax!ihnp4!ames!jaw)
+ *	Joe Orost               (decvax!vax135!petsd!joe)
+ *****************************************************************/
+</pre>
+
+
+</body>
+</html>
+

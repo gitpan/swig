@@ -1,0 +1,11 @@
+graph.c
+
+This directory contains a program for combining some very simple
+graph algorithms with a Tcl/Tk interface.   It combines some
+graph algorithms written in C, a C data structure for representing
+nodes and adjacency lists and a Tk interface.
+
+To compile, type 'make'.  This will build a module for the Tcl/Tk
+plugin.   Run Navigator 3.0 on the file graph.html to run.
+
+

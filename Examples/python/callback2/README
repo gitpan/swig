@@ -1,0 +1,4 @@
+This example shows one method for adding Python
+functions as callbacks to C programs.  Requires
+some familiarity with Python's C API and SWIG's
+typemap mechanism.

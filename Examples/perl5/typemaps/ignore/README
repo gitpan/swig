@@ -1,0 +1,4 @@
+This shows how to use a typemap to ignore function arguments by setting
+them to some default value.
+
+

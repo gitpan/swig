@@ -1,0 +1,12 @@
+This example shows how one might pass C structures to and
+from Perl as arrays instead of pointers using typemaps.
+
+In this case, we'll parse the /etc/passwd file and convert it
+to and from a C representation.
+
+Disclaimer : This is somewhat hideous.  While I think it's correct,
+it's entirely possible I have misinterpreted something in perlguts(1).
+
+
+
+

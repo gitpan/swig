@@ -1,0 +1,8 @@
+This example shows how constraints can be applied to function
+arguments.  Relies on the SWIG constraints.i library.
+
+The best way to try this example is to look at the file
+example.i and issue commands interactively in the tclsh
+shell.    Try giving commands with bogus values and see that
+SWIG is generating error messages.
+

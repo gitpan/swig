@@ -1,0 +1,8 @@
+SRCS      = 
+INTERFACE = inherit.i
+WRAPFILE  = inherit_wrap.cxx
+TARGET    = inherit.dll
+SWIGOPT   = -c++ -shadow
+
+!include ..\..\..\Makefile.win
+

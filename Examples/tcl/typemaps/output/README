@@ -1,0 +1,2 @@
+This example shows how one can return values from function
+arguments using the SWIG typemaps.i library.

@@ -1,0 +1,6 @@
+A *really* simple example to test inheritance.
+
+inherit.tcl      - Test script using old SWIG interface
+inherit1.tcl     - Test script using object oriented interface
+
+

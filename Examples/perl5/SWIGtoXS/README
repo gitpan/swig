@@ -1,0 +1,25 @@
+SWIGtoXS
+
+(and not have a hangover in the morning)
+
+This example shows how SWIG can interact with a function created
+using xsubpp.    Two Perl5 modules are created :
+
+produce :    This is a module created using Perl5's xsubpp compiler.
+	     It produces a C array of pointers and returns a 
+             pointer to it.    It also has a function for printing
+             out array values.
+
+consume :    This is a SWIG generated module containing a function
+             that takes a double *, negates all of the values,
+             and returns the result in a new array.
+
+The script swigxs.pl shows how it works.
+
+To compile this example, just type 'make'.  You might have to
+tweak the file 'Makefile.template' if this fails for some reason.
+
+
+
+	
+      

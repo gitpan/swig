@@ -1,0 +1,16 @@
+graph.c
+
+This directory contains a program for combining some very simple
+graph algorithms with a Tcl/Tk interface.   It combines some
+graph algorithms written in C, a C data structure for representing
+nodes and adjacency lists and a Tk interface.
+
+To compile, check the makefile to make sure the include directories
+are set right and compile.   To run the program, type "./graph"
+
+This isn't the greatest user interface... in fact, it downright
+sucks.  Guess it's a good thing I'm not paid to design GUIs!
+
+
+
+

@@ -1,0 +1,6 @@
+PDE Example from users manual. This time with helper
+functions to access grid data.
+
+ex3.y, ex5.py    - Python scripts
+ex4.c            - C++ implementation
+

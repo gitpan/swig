@@ -1,0 +1,8 @@
+SRCS      = 
+INTERFACE = nested.i
+WRAPFILE  = nested_wrap.cxx
+TARGET    = nested.dll
+SWIGOPT   = -shadow
+
+!include ..\..\..\Makefile.win
+

@@ -1,0 +1,4 @@
+This example shows a clever way in which C arrays can be created in
+Tcl.   The file 'array.tcl' provides a wrapper around the functions
+in array.i.   The file 'test.tcl' shows how can it be used.
+

@@ -1,0 +1,7 @@
+SRCS      = 
+INTERFACE = integer.i
+WRAPFILE  = integer_wrap.cxx
+TARGET    = itest.dll
+
+!include ..\..\..\..\Makefile.win
+

@@ -1,0 +1,13 @@
+Tcl examples
+
+You may have to edit the Makefile to get this to compile (assumes dynamic
+loading).
+
+plotter.tcl        -  An simple 2D function plotting utility.
+mandel.tcl         -  Plots the Mandelbrot set and lets you 
+                      navigate around.
+simple.tcl         -  A very simple plot.
+
+To run the examples, simply run wish on the script file. For example,
+'wish plotter.tcl'.
+

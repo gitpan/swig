@@ -1,0 +1,99 @@
+SWIG MATLAB Module
+June 23, 1997
+
+This is a *highly* experimental language module that allows SWIG to
+create native MATLAB cmex wrappers. That is, you can take a C library
+and turn it into a working MATLAB module.
+
+At this time, this module has only been tested with MATLAB 5.0 under
+Windows NT-4.0.   You mileage may vary.
+
+How to compile
+--------------
+
+1.  Compile the SWIG MATLAB module.  This results in an executable 
+    called 'swigmatlab'.
+
+2.  Run swigmatlab on your interface files :
+
+         swigmatlab example.i
+
+3.  Compile your module using the MATLAB mex compile. For example :
+
+         mex example.c example_wrap.i
+
+
+How to use
+----------
+
+In MATLAB, you can initialize the module by typing 
+ 
+      MATLAB >> example
+      
+Due to the way in which cmex files are constructed, all of the methods
+in your module need to be accessed by name as in :
+
+      MATLAB >> example('fact', 4)
+
+      ans = 
+
+          24
+      
+      MATLAB >>
+
+Constants are created by making new MATLAB variables.  You should 
+be able to access them like any other variable.
+
+C variables are access using get/set methods as in :
+
+      MATLAB >> example('my_variable_set',42)
+      MATLAB >> a = example('my_variable_get')
+
+C pointers are mapped to strings exactly as in the Tcl and Python
+modules.  No special processing is applied.
+
+Limitations
+-----------
+No support for C arrays or mapping between MATLAB matrices and
+arrays has been implemented yet.  
+
+Documentation support hasn't been added yet.
+
+This module is essentially untested.
+
+Customization
+-------------
+You are encouraged to customize this module to make it better.  To do
+this, consider modifying the file 'matlab.map'.  This file contains
+all of the processing that SWIG is applying to build the MATLAB
+module.  You can customize this file in almost any way--including
+giving SWIG the ability to interact with MATLAB matrices and other
+complex objects.
+
+Note : It may be possible to use this module with MATLAB 4.2 using
+a careful set of C preprocessor macros to remap the MATLAB 5.0 names
+into MATLAB 4.2 names. This has not been tested.
+
+Future plans
+------------
+Eventually this module may turn into a 'real' SWIG module that is
+built with the other modules.  For now, however, it remains
+experimental and under development.
+
+Files 
+-----
+
+matlab.h          - Header file for the MATLAB module
+matlab.cxx        - C++ implementation of the module
+main.cxx          - SWIG main program
+matlab.map        - Typemap file describing how to map C objects to 
+                    and from MATLAB objects.
+mlinit.swg        - Configuration code used by the module to initialize
+                    a module and parse commands.
+mlheader.swg      - Configuration file containing the header files needed
+                    to build a MATLAB module.
+Makefile          - Makefile for UNIX
+Makefile.msc      - Makefile for Windows NT
+example.i         - Very simple test code
+test.m            - Test .m file for testing the module.
+

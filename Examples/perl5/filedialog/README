@@ -1,0 +1,9 @@
+File Selection Dialog (Windows-95/NT only)
+
+This example provides Perl access to a Windows file selection dialog.
+Run the script 'test.pl' to see an example.
+
+Many thanks to Jamie O'Shaughnessy for providing this example.
+
+
+

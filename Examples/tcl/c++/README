@@ -1,0 +1,20 @@
+This directory contains some simple C++ examples.    This
+directory is by no means comphrehensive, but it's got many
+of the things you can do with SWIG in it.
+
+All of these examples are for Tcl (primarily because it's
+extremely easy to rebuild and use with C++).   To compile,
+you should be able to type 'make' in each subdirectory.
+Compilation relies on the file 'Makefile.template' in the top
+level directory.    If compilation fails, you'll need to
+edit that file appropriately.
+
+SWIG's support for C++ is an ongoing project.   There are certainly
+gaps in the C++ parser.   If you have any ideas on how to improve
+the current implementation or if you find any weird bugs, please
+let me know.
+
+-- Dave Beazley
+August 20, 1996
+
+

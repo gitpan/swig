@@ -1,0 +1,5 @@
+This example shows how to pass a Perl filehandle into a FILE *. 
+
+Note :  This does not seem to work under Windows for reasons
+I have not been able to determine yet.
+

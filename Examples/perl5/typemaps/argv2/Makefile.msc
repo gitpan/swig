@@ -1,0 +1,7 @@
+SRCS      = 
+INTERFACE = argv.i
+WRAPFILE  = argv_wrap.cxx
+TARGET    = argv.dll
+
+!include ..\..\..\..\Makefile.win
+

@@ -1,0 +1,360 @@
+// ------------------------------------------------------------------------
+// A simple SWIG Language module
+//
+// ------------------------------------------------------------------------
+
+#include "swig.h"
+#include "lang.h"
+
+static char *usage = "\
+My Language Options\n\
+     -module name    - Set name of module\n\n";
+
+// ---------------------------------------------------------------------
+// MYLANG::parse_args(int argc, char *argv[])
+//
+// Parse my command line options and initialize by variables.
+// ---------------------------------------------------------------------
+
+void MYLANG::parse_args(int argc, char *argv[]) {
+
+  // Look for certain command line options
+  for (int i = 1; i < argc; i++) {
+    if (argv[i]) {
+      if (strcmp(argv[i],"-module") == 0) {
+	if (argv[i+1]) {
+	  set_module(argv[i+1],0);
+	  mark_arg(i);
+	  mark_arg(i+1);
+	  i++;
+	} else {
+	  arg_error();
+	}
+      } else if (strcmp(argv[i],"-help") == 0) {
+	fprintf(stderr,"%s\n", usage);
+      }
+    }
+  }
+
+  // Set location of SWIG library
+  strcpy(LibDir,"mylang");
+
+  // Add a symbol to the parser for conditional compilation
+  add_symbol("SWIGMYLANG",0,0);
+
+  // Add typemap definitions
+  typemap_lang = "mylang";
+}
+
+// ---------------------------------------------------------------------
+// void MYLANG::parse()
+//
+// Start parsing an interface file for MYLANG.
+// ---------------------------------------------------------------------
+
+void MYLANG::parse() {
+
+  fprintf(stderr,"Making wrappers for My Language\n");
+
+  headers();       // Emit header files and other supporting code
+
+  // Tell the parser to first include a typemap definition file
+
+  if (include_file("lang.map") == -1) {
+    fprintf(stderr,"Unable to find lang.map!\n");
+    SWIG_exit(1);
+  }
+  yyparse();       // Run the SWIG parser
+}
+
+// ---------------------------------------------------------------------
+// MYLANG::set_module(char *mod_name,char **mod_list)
+//
+// Sets the module name.  Does nothing if it's already set (so it can
+// be overriddent as a command line option).
+//
+// mod_list is a NULL-terminated list of additional modules.  This
+// is really only useful when building static executables.
+//----------------------------------------------------------------------
+
+void MYLANG::set_module(char *mod_name, char **mod_list) {
+  if (module) return;
+  module = new char[strlen(mod_name)+1];
+  strcpy(module,mod_name);
+}
+
+// ---------------------------------------------------------------------
+// MYLANG::headers(void)
+//
+// Generate the appropriate header files for MYLANG interface.
+// ----------------------------------------------------------------------
+
+void MYLANG::headers(void)
+{
+  emit_banner(f_header);               // Print the SWIG banner message
+  fprintf(f_header,"/* Implementation : My Language */\n\n");
+
+  // Include header file code fragment into the output
+  if (insert_file("header.swg",f_header) == -1) {
+    fprintf(stderr,"Fatal Error. Unable to locate 'header.swg'.\n");
+    SWIG_exit(1);
+  }
+
+  // Emit the default SWIG pointer type-checker (for strings)
+  if (insert_file("swigptr.swg",f_header) == -1) {
+    fprintf(stderr,"Fatal Error. Unable to locate 'swigptr.swg'.\n");
+    SWIG_exit(1);
+  }
+}
+
+// --------------------------------------------------------------------
+// MYLANG::initialize(void)
+//
+// Produces an initialization function.   Assumes that the init function
+// name has already been specified.
+// ---------------------------------------------------------------------
+
+void MYLANG::initialize() 
+{
+  // Generate a CPP symbol containing the name of the initialization function
+  fprintf(f_header,"#define SWIG_init    %s_Init\n\n\n", module);  
+
+  // Start generating the initialization function
+  fprintf(f_init,"int SWIG_init(Tcl_Interp *interp) {\n");
+  fprintf(f_init,"\t if (interp == 0) return TCL_ERROR;\n");
+}
+
+// ---------------------------------------------------------------------
+// MYLANG::close(void)
+//
+// Wrap things up.  Close initialization function.
+// ---------------------------------------------------------------------
+
+void MYLANG::close(void)
+{
+  // Dump the pointer equivalency table
+  emit_ptr_equivalence(f_init);
+
+  // Finish off our init function and print it to the init file
+  fprintf(f_init,"\t return TCL_OK;\n");
+  fprintf(f_init,"}\n");
+}
+
+// ----------------------------------------------------------------------
+// MYLANG::create_command(char *cname, char *iname)
+//
+// Creates a MYLANG command from a C function.
+// ----------------------------------------------------------------------
+
+void MYLANG::create_command(char *cname, char *iname) {
+  char *wname;
+
+  wname = name_wrapper(cname,"");
+
+  fprintf(f_init,"\t Tcl_CreateCommand(interp,\"%s\",%s, (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL);\n", iname, wname);
+
+}
+
+// ----------------------------------------------------------------------
+// MYLANG::create_function(char *name, char *iname, DataType *d, ParmList *l)
+//
+// Create a function declaration and register it with the interpreter.
+// ----------------------------------------------------------------------
+
+void MYLANG::create_function(char *name, char *iname, DataType *t, ParmList *l)
+{
+  String           source, target;
+  char             *tm;
+  String           cleanup, outarg;
+
+  // A new wrapper function object
+
+  WrapperFunction  f;
+
+  // Make a wrapper name for this function
+  
+  char *wname = name_wrapper(iname,"");
+
+  // Now write the wrapper function itself....this is pretty ugly
+
+  f.def << "static int " << wname << "(ClientData clientData, Tcl_Interp *interp, int argc, char *argv[]) {\n";
+
+  // Emit all of the local variables for holding arguments.
+  int pcount = emit_args(t,l,f);
+
+  // Get number of optional/default arguments
+  int numopt = l->numopt();
+
+  // Emit count to check the number of arguments
+  f.code << tab4 << "if ((argc < " << (pcount-numopt) + 1 << ") || (argc > " << l->numarg()+1 << ")) {\n"
+	 << tab8 << "Tcl_SetResult(interp, \"Wrong # args.\",TCL_STATIC);\n"
+	 << tab8 << "return TCL_ERROR;\n"
+	 << tab4 << "}\n";
+
+
+  // Now walk the function parameter list and generate code to get arguments
+  int j = 0;                // Total number of non-optional arguments
+
+  for (int i = 0; i < pcount ; i++) {
+    Parm &p = (*l)[i];         // Get the ith argument
+    source = "";
+    target = "";
+
+    // Produce string representation of source and target arguments
+    source << "argv[" << j+1 << "]";
+    target << "_arg" << i;
+
+    if (!p.ignore) {
+      if (j >= (pcount-numopt))  // Check if parsing an optional argument
+	f.code << tab4 << "if argc >" << j+1 << ") {\n";
+
+      // Get typemap for this argument
+
+      tm = typemap_lookup("in",typemap_lang,p.t,p.name,source,target,&f);
+      if (tm) {
+	f.code << tm << "\n";
+	f.code.replace("$arg",source);   // Perform a variable replacement
+      } else {
+	fprintf(stderr,"%s : Line %d. No typemapping for datatype %s\n",
+		input_file,line_number, p.t->print_type());
+      }
+      if (j >= (pcount-numopt))
+	f.code << tab4 << "} \n";
+      j++;
+    }
+
+    // Check to see if there was any sort of a constaint typemap
+    if ((tm = typemap_lookup("check",typemap_lang,p.t,p.name,source,target))) {
+      // Yep.  Use it instead of the default
+      f.code << tm << "\n";
+      f.code.replace("$arg",source);
+    }
+
+    // Check if there was any cleanup code (save it for later)
+    if ((tm = typemap_lookup("freearg",typemap_lang,p.t,p.name,target,"interp->result"))) {
+      // Yep.  Use it instead of the default
+      cleanup << tm << "\n";
+      cleanup.replace("$arg",source);
+    }
+    if ((tm = typemap_lookup("argout",typemap_lang,p.t,p.name,target,"interp->result"))) {
+      // Yep.  Use it instead of the default
+      outarg << tm << "\n";
+      outarg.replace("$arg",source);
+    }
+  }
+
+  // Now write code to make the function call
+
+  emit_func_call(name,t,l,f);
+
+  // Return value if necessary 
+
+  if ((t->type != T_VOID) || (t->is_pointer)) {
+    if ((tm = typemap_lookup("out",typemap_lang,t,name,"_result","interp->result"))) {
+      // Yep.  Use it instead of the default
+      f.code << tm << "\n";
+    } else {
+      fprintf(stderr,"%s : Line %d. No return typemap for datatype %s\n",
+	      input_file,line_number,t->print_type());
+    }
+  }
+
+  // Dump argument output code;
+  f.code << outarg;
+
+  // Dump the argument cleanup code
+  f.code << cleanup;
+
+  // Look for any remaining cleanup
+
+  if (NewObject) {
+    if ((tm = typemap_lookup("newfree",typemap_lang,t,iname,"_result",""))) {
+      f.code << tm << "\n";
+    }
+  }
+
+  if ((tm = typemap_lookup("ret",typemap_lang,t,name,"_result",""))) {
+    f.code << tm << "\n";
+  }
+
+  // Wrap things up (in a manner of speaking)
+  f.code << tab4 << "return TCL_OK;\n}";
+
+  // Substitute the cleanup code (some exception handlers like to have this)
+  f.code.replace("$cleanup",cleanup);
+ 
+  // Emit the function
+  
+  f.print(f_wrappers);
+  
+  // Now register the function with the language
+
+  create_command(name,iname);
+  
+  // If there's a documentation entry, produce a usage string
+  
+  if (doc_entry) {
+
+    static DocEntry *last_doc_entry = 0;
+
+    // Use usage as description
+    doc_entry->usage << iname;
+
+    // Set the cinfo field to specific a return type 
+
+    if (last_doc_entry != doc_entry) {
+      doc_entry->cinfo << "returns " << t->print_type();
+      last_doc_entry = doc_entry;
+    }
+  }
+}
+
+// -----------------------------------------------------------------------
+// MYLANG::link_variable(char *name, char *iname, DataType *t)
+//
+// Create a MYLANG link to a C variable.
+// -----------------------------------------------------------------------
+
+void MYLANG::link_variable(char *name, char *iname, DataType *t)
+{
+
+  char *tm;
+
+  // Uses a typemap to stick code into the module initialization function
+  // Check to see if this can be wrapped in the init function
+  
+  if ((tm = typemap_lookup("varinit",typemap_lang,t,name,name,iname))) {
+    String temp = tm;
+    if (Status & STAT_READONLY)
+      temp.replace("$status"," | TCL_LINK_READ_ONLY");
+    else
+      temp.replace("$status","");
+    fprintf(f_init,"%s\n",(char *) temp);
+  } else {
+    fprintf(stderr,"%s : Line %d. Unable to link with variable type %s\n",
+	    input_file,line_number,t->print_type());
+  }
+}
+
+// -----------------------------------------------------------------------
+// MYLANG::declare_const(char *name, char *iname, DataType *type, char *value)
+//
+// Makes a constant.  A quick trick is to make a variable and create a
+// link to it.
+// ------------------------------------------------------------------------
+
+void MYLANG::declare_const(char *name, char *iname, DataType *type, char *value) {
+
+  char *tm;
+  
+  if ((tm = typemap_lookup("const",typemap_lang,type,name,name,iname))) {
+    String str = tm;
+    str.replace("$value",value);
+    fprintf(f_init,"%s\n", (char *) str);
+  } else {
+    fprintf(stderr,"%s : Line %d. Unable to create constant %s = %s\n", 
+	    input_file, line_number, type->print_type(), value);
+  }
+}
+
+

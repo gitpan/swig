@@ -1,0 +1,7 @@
+These examples show how typemaps can be used to change SWIG's
+behavior.   These are not for the timid--a knowledge of Perl's
+internals and SWIG's operation is assumed.  See the man page
+on perlguts(1) and the SWIG User's manual for more information.
+
+
+

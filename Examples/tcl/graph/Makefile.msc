@@ -1,0 +1,7 @@
+SRCS      = graph.c
+INTERFACE = graph.i
+WRAPFILE  = graph_wrap.c
+TARGET    = graph.dll
+
+!include ..\..\..\Makefile.win
+

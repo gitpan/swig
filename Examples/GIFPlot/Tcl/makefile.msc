@@ -1,0 +1,68 @@
+# Makefile for building various SWIG generated extensions
+
+SRCS          = 
+IDIR          = ..\Interface
+IFILE         = gifplot
+INTERFACE     = $(IDIR)\$(IFILE).i
+WRAPFILE      = $(IFILE)_wrap.c
+WOBJS         = $(WRAPFILE:.c=.obj)
+OBJS          = $(SRCS:.c=.obj)
+
+# Location of the Visual C++ tools (32 bit assumed)
+
+TOOLS         = $(MSVCDIR)
+TARGET        = gifplot.sl
+CC            = cl.exe
+LINK          = link.exe
+INCLUDE32     = -I"$(TOOLS)\include"
+MACHINE       = IX86
+
+# C Library needed to build a DLL
+
+DLLIBC        = msvcrt.lib oldnames.lib  
+
+# Windows libraries that are apparently needed
+
+WINLIB        = kernel32.lib advapi32.lib user32.lib gdi32.lib comdlg32.lib winspool.lib
+
+# Libraries common to all DLLs
+
+LIBS          = $(DLLIBC) $(WINLIB) ..\gifplot.lib
+
+# Linker options
+
+LOPT      = -debug:full -debugtype:cv /NODEFAULTLIB /RELEASE /NOLOGO /MACHINE:$(MACHINE) -entry:_DllMainCRTStartup@12 -dll
+
+# C compiler flags
+
+CFLAGS    = /Z7 /Od /c /W3 /nologo /G5
+
+TCL_INCLUDES  = -Id:\tcl8.0\generic -Id:\tcl8.0\win
+TCLLIB        = d:\tcl8.0\win\tcl80.lib
+INCLUDES      = -I..\Include
+
+tcl::
+	c:\swig1.1\swig -tcl -o $(WRAPFILE) $(INTERFACE)
+	$(CC) $(CFLAGS) $(INCLUDES) $(TCL_INCLUDES) $(SRCS) $(WRAPFILE)
+	set LIB=$(TOOLS)\lib
+	$(LINK) $(LOPT) -out:$(TARGET) $(LIBS) $(TCLLIB) $(OBJS) $(WOBJS)
+
+mandel::
+	c:\swig1.1\swig -tcl -I..\Interface -o mandel_wrap.c mandel.i
+	$(CC) $(CFLAGS) $(INCLUDES) $(TCL_INCLUDES) mandel_wrap.c
+	set LIB=$(TOOLS)\lib
+	$(LINK) $(LOPT) -out:mandel.sl $(LIBS) $(TCLLIB) mandel_wrap.obj
+
+clean::
+	del *.obj
+	del *.dll
+	del *.pll
+	del *.lib
+	del *.exp
+	del *_wrap*
+	del *.pdb
+	del *.pch
+	del *.pm
+	del *.sl
+	del *~
+

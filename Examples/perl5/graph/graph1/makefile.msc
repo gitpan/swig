@@ -1,0 +1,7 @@
+SRCS      = /Tpgraph.c
+INTERFACE = graph.i
+WRAPFILE  = graph_wrap.cxx
+TARGET    = graph.dll
+
+!include ..\..\..\..\Makefile.win
+

@@ -1,0 +1,6 @@
+Matrix example.  To run the example, execute the program 'matrix' and
+type the following :
+
+          (load 'matrix.scm)
+
+

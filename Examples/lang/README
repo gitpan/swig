@@ -1,0 +1,20 @@
+SWIG Language Module
+
+This example shows how one can write a new SWIG language module.
+Writing a new language assumes that you are intimately familiar with
+the target scripting language, SWIG typemaps, and C++ programming.
+
+In this case, we build a very simple Tcl module.
+
+Files :
+
+        lang.h          -  Minimal header file needed for a language module
+        lang.cxx        -  C++ code for the language.
+        lang.map        -  A typemap file containing all of the handling for
+                           different datatypes.
+        header.swg      -  Header file included by our language module.
+        main.cxx        -  Main program needed to start the SWIG parser.
+        mylang.cxx      -  A skeleton language module (from the user manual).
+
+
+

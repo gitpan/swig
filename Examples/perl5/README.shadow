@@ -1,0 +1,305 @@
+Perl5 Shadow Classes (highly experimental, but cool)
+
+October 23, 1996
+
+1.  Introduction
+----------------
+
+This release of SWIG now supports the concept of "shadow classing"
+in Perl5.  What is shadow classing you ask?  In a nutshell, 
+shadow classing attempts to create Perl classes and objects that
+behave exactly like you would expect, except that they really
+mirror (or shadow) real C/C++ data structures.    As a result,
+you get a really nice interface to your C program.
+
+This implementation would not be possible without the generous
+contributions of David Fletcher and Gary Holt who independently
+provided radically different prototype implementations.  I have
+combined ideas from both approaches and generalized the Perl5
+module in an attempt to solve some of the more subtle problems.
+
+2.  Implementation details
+--------------------------
+
+The shadow classing mechanism is built using a combination of
+C and Perl.   SWIG's low-level C interface is used at the lowest
+level while Perl is used to provide the high-level structure.  While,
+the C interface is essentially the same as before, you can 
+look at the Perl support code by simply loading the resulting '.pm'
+file into your editor.  Since it's written in Perl, it's compact,
+and easily customizable without having to recompile the C module.
+
+3.  Invocation
+--------------
+
+To invoke SWIG's shadow class support, run the Perl5 module with the
+'-shadow' option.  SWIG will produce two files as before--a .c file
+and a .pm file.  However, in this case, the .pm file will contain a
+collection of supporting Perl code.
+
+The shadowing option results in two packages.   The low-level interface
+is managed in a package 'packagec' where 'package' is the name you
+gave to the package (The 'c' is appended onto the end).    A cleaned
+up package is found in 'package'.   This package contains fixed 
+method invocations to take care of Perl objects and classes before
+calling the lower level interface.  If you're completely confused,
+don't worry--it's not as weird as it sounds (well, hopefully it's not).
+
+4.  Example :
+-------------
+Let's say you have the following interface file :
+
+   %module vector
+
+   struct Vector {
+       double x, y, z;
+       Vector();
+      ~Vector();
+       void print();
+   };
+
+   Vector add(Vector a, Vector b);
+
+   %include perlmain.i         // Build a static version of Perl
+
+You could wrap this with SWIG as follows :
+
+   % swig -perl5 -shadow -static vector.i
+   % # compile it into a program named 'vecperl'
+
+After compilation, you will end up with a new version of Perl (or a 
+shared library if you're using dynamic loading) and a file 'vector.pm'.
+
+Now, we could use our new module as follows :
+
+   #!/vecperl     
+   # Test our new version of Perl out
+   
+   use vector;                      #Load our module
+
+   # Create a new vector
+   $v = Vector->new();	
+   $v->{x} = 2.5;
+   $v->{y} = -1.0;
+   $v->{z} = 7.0;
+   $v->print();                     # Print it out
+
+   # Create another vector using different syntax
+
+   $w = Vector::new();
+   %$w = ( x => 3.0, y => 9.0, z => -2.5 );
+   
+   # Create yet another vector using yet another syntax
+
+   $u = new Vector;
+   %$u = ( x => 0.0, y => 5.0, z => 0.0 );
+
+   # Add some vectors together
+
+   $z = vector::add($v,vector::add($w,$u));
+   $z->print();
+
+Now, let's say we wanted to make a more sophisticated structure like this :
+
+   struct Particle {
+	Particle();
+	~Particle();
+	Vector r;
+	Vector v;
+	Vector f;
+	int    type;
+   };
+
+We can use it in an entirely natural way in Perl :
+
+   #!vecperl
+
+   $p = new Particle;
+   %{$p->{r}} = ( x=> 0.0, y => 0.0, z=> 0.0);   # Set 'r'
+   %{$p->{v}} = ( x=> 0.0, y => 0.0, z=> 0.0);   # Set 'v'
+   %{$p->{f}} = ( x=> 0.0, y => 0.0, z=> 0.0);   # set 'f'
+   $p->{type} = 1;
+
+   # Print out the components
+   $p->{r}->print();
+   $p->{v}->print();
+   $P->{f}->print();
+
+Simple public inheritance is also support in a natural manner. (Multiple
+inheritance is not currently supported).
+	
+5.   The Gory Details
+---------------------
+
+So now that you've pondered the above example, you may have a few
+questions :
+
+      1.   How are classes implemented?
+      2.   How are member attributes handled?
+      3.   What is an "object?"
+      4.   How are function arguments handled? (and how do stand-alone functions like add()
+           above work?)
+      5.   Who controls what? (or who owns what?).
+
+
+How are classes implemented ? :
+
+
+Classes are represented as Perl packages as described in chapter 5
+or "Programming Perl (2nd Ed.)", by Wall, Christiansen, and Scwartz.
+The individual methods are simply wrappers around the low-level SWIG
+interface.   While one might ask why it's necessary to have these
+extra wrappers, it turns out that it is sometimes necessary to munge
+function arguments before calling a C function so having this in Perl
+makes it quite convenient.
+
+Inheritance is supported using the Perl @ISA array.  As far as I know
+it works in a completely straightforward manner.
+
+
+How are member attributes handled ? :
+
+
+Member attributes are implemented using tied-hash tables.  Different
+data items are accessed as if they were in a hash table while all
+class methods can still be applied normally.   This tied-hash 
+interface is somewhat magical but seems to work.    Even classes that
+have no data members are represented as tied-hashes.   There are
+reasons for this....
+
+
+What is an "object?" :
+
+
+When you invoke a constructor or get an object back, you will get
+a tied-hash table returned to you.    While this behaves alot like a
+Perl5 scalar object, it's really quite different.   If you want
+to access the low-level scalar object returned by SWIG, you can
+do it as follows :
+
+	$v = new Vector;
+	$vscalar = tied(%$v);
+
+
+How are function arguments handled ? :
+
+
+In our example, we had the following function :
+
+	Vector add(Vector a, Vector b);
+	
+If any of a function's arguments match the definition of an 
+object that we have wrapped into a Perl class (or package, or
+whatever), then SWIG will expect to received a tied-hash table
+as input.   Similarly, if the return result is a complex
+data type corresponding to a Perl class, SWIG will make this
+function return a tied-hash table representation.   Any function
+arguments not matching a Perl class are simply mapped into
+a normal SWIG argument type like before.
+
+Thus, with this scheme, we can invoke the add() function by
+simply passing the objects returned by the Vector constructor :
+
+	$v = new Vector;
+	$w = new Vector;
+	$z = vector::add($v,$w);
+
+If you're scratching your head wondering about how the "Vector"
+type is used in the function call, refer to the SWIG users
+guide and the section on 'Complex Datatypes.'   However, to
+make a long story short, the add() function above results
+in an implicit creation of a new vector to hold the result.   Since
+SWIG only knows about pointers to this, a return type of "Vector"
+makes no sense.  Therefore, SWIG calls the function like this :
+
+	Vector *wrap_add(Vector *a, Vector *b) {
+	       Vector *result;
+               result = (Vector *) malloc(sizeof(Vector));
+	       *result = add(*a,*b);
+	       return return;
+        }
+
+Upon first glance, you immediately notice a huge memory leak
+problem which brings us to the last point...
+
+Who owns what?
+
+SWIG needs to manipulate objects that are both created in Perl and
+C/C++.  However, if a Perl class has a destructor in it, then Perl
+will try to destroy every object when it is no longer needed.
+Obviously, this is a problem if the object was really created in C/C++
+and is being used for some other thing inside the C code (having Perl
+going around arbitrarily destroying things is probably a bad idea).
+To solve these problems, SWIG applies the following rules :
+
+	1.   If Perl created the object, then Perl can destroy it
+	2.   If SWIG created the object (perhaps implicitly like in the
+             add() function), then Perl owns the object and can
+             destroy it as well.
+        3.   Otherwise, Perl is not allowed to destroy the object.
+
+
+To illustrate how this works, consider two different functions :
+
+	Vector add(Vector a, Vector b) {
+	    Vector result;
+	    result.x = a.x + b.x;
+            result.y = a.y + b.y;
+            result.z = a.z + b.z;
+        }
+
+	Vector *get(Vector *a, int i) {
+	    return a+i;
+        }
+
+	
+The function add() adds two vectors but results in an implicit malloc()
+when SWIG returns the result.  The get() function simply returns a pointer
+to a vector in an array.
+
+Now in Perl, 
+
+       $a = add($x,$y);       # Perl now owns the result $a
+       
+       # Since perl owns the result of add(), it can be deleted.
+       # This makes the following code have no memory leaks :
+
+       $a = add(add(add($x,$y),$y),$y);
+
+       # There are no memory leaks in this code since Perl owns
+       # the intermediate results and can clean up as necessary.
+
+       # Now look at this :
+
+       for ($i = 0; $i < 100; $i++) {
+	   $a = get($x,$i);
+	   $a->print();
+       }
+ 
+       # This code loops over an array of 100 vectors and prints
+       # them out.   In this case, the return value of get()
+       # is owned by C (there is no way for Perl to know where
+       # the pointer is coming from).  Every time $a is reassigned,
+       # Perl destroys the old value.   However, since Perl doesn't
+       # own this vector (by our rules), the actual Vector is not
+       # destroyed.
+
+6.   Examples
+-------------
+
+The "shadow" directory contains a number of shadow-class examples for
+Perl5.   Hopefully this is enough to get you going.
+
+
+7.  Disclaimer
+--------------
+
+This modification is highly experimental.   I believe that it works, but
+if you find any errors, please post a message to swig@cs.utah.edu.
+
+
+
+
+
+
+

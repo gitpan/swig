@@ -1,0 +1,4 @@
+This example shows how one can remap SWIG's treatment
+of Tcl constants by mapping them into Tcl hash tables.
+
+

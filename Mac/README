@@ -1,0 +1,8 @@
+The Macintosh version of SWIG is now a separate distribution (both in
+source and binary form).  Building it from source is tricky and
+requires Tcl 8.0, MacGoodies, and Code Warrior 10.  If at all
+possible, look for the binary distribution instead.
+
+The Macintosh port is a work in progress.  Don't expect it work with
+everything, but constributions to the effort are always welcome!
+

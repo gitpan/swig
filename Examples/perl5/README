@@ -1,0 +1,89 @@
+SWIG Perl5 Examples
+
+This directory contains a variety of simple examples for Perl5.
+These are primarily intended to illustrate SWIG concepts as
+opposed to being particularly "useful".
+
+simple      - The simple example from the user manual.
+
+except      - Shows how you can turn C++ exceptions into Perl exceptions.
+
+tree        - Binary search trees in Perl5.
+
+SWIGtoXS    - Shows how pointers can be passed between
+              an xsubpp generated wrapper and a SWIG generated
+              wrapper.
+
+c++         - An example showing how to create a C++ module for Perl.
+
+shadow      - A example showing how to use Perl5 shadow classes
+
+defarg      - Use default arguments with C/C++ functions
+
+multinherit - Wrapping of C++ multiple inheritance
+
+typemaps    - Various examples using SWIG's typemap mechanism.
+
+nested      - Shows how nested structures can be used.
+
+graph       - Example from the User manual.
+
+filedialog  - Pops up Windows file dialogs from Perl (Win 95/NT only)
+
+Unix Instructions
+-----------------
+All of these examples have been compiled and successfully tested with
+Perl5.003 and Perl5.004. In order to compile, you may need to edit the
+file 'Makefile.template' in the top-level directory so that it can
+find your Perl5 header files and libraries.  There are sometimes
+compilation problems with building both C and C++ Perl extensions.
+See the file 'TROUBLESHOOTING' for more details.
+
+To build each example, go to that directory and type 'make'.  This
+will run SWIG, and compile a dynamically loadable Perl module.  If
+dynamic loading is not supported on your machine, typing 'make static'
+will rebuild the Perl interpreter called 'myperl' that you should run
+to test the example.
+
+Windows NT Instructions
+-----------------------
+Most of the examples have been tested using the ActiveWare Perl for
+Win32 Build 303 (Perl 5.003_07). Some examples will not compile due to
+Unix dependencies and/or runtime problems under NT.  All of the
+examples rely on the file 'Makefile.win' in the SWIG top level
+directory and should be built from the command prompt.  To do this,
+edit the file 'Makefile.win' to point to your installation of Visual
+C++, Perl, and other libraries.  Now to build each example, go into
+the appropriate example and type 'nmake /f makefile.msc perl'.  This
+will build a DLL that you can load into perl.  To run, simply type
+'perl file.pl' where 'file.pl' is any one of the '.pl' files in the
+example directories.
+
+1/4/98  : A Makefile for Borland C++ 5.x has been written, but is untested.
+
+6/22/97 : SWIG has now been tested with Perl5.004 for NT and it
+appears to work.
+
+Disclaimer : SWIG support for NT is new.  Please report build and/or
+runtime problems to beazley@cs.utah.edu.   I'm also looking for
+makefiles to build the examples under different compilers.
+
+
+---- Most Recent Testing Information ---
+
+Date checked : January 3, 1998
+Versions     : Perl 5.003
+OS           : Linux 2.0.27
+            
+Date checked : June 22, 1997
+Versions     : Perl 5.003, Perl5.004
+OS           : Linux 2.0.27, Irix 6.2, MkLinux DR2.1
+               Windows NT 4.0.
+
+
+
+
+
+
+
+

@@ -1,0 +1,15 @@
+Objective-C Example
+
+This is a very simple example involving some Objective-C code.
+
+Disclaimer : This is highly experimental and has only been tested
+with gcc 2.7.2 under Linux 2.0.28.   
+
+To build an Objective-C module, run swig with the -objc option.
+Also, you need to make sure your interface file includes the
+file 'objc.i'.  This file contains some definitions and support
+code to make Objective-C datatypes work a little better.
+
+Note : you will need to tweak the Makefile for your machine.
+
+

@@ -1,0 +1,151 @@
+# ---------------------------------------------------------------------------
+# Makefile.win
+#
+# Dave Beazley
+# June 24, 1997
+#
+# This file is used to build all of the examples in the 'Examples' directory
+# under Windows 95/NT.    This assumes that you are using Borland C++ 5.x.
+#
+# By default this only builds DLLs.
+# ---------------------------------------------------------------------------
+
+# Location of the Borland C++ directory
+TOOLS         = e:\bc5
+
+# The C/C++ compiler
+CC            = bcc32.exe
+
+# The linker
+LINK          = tlink32.exe
+
+# Include directories for your compiler
+INCLUDE32     = -I"$(TOOLS)\include"
+
+# Target machine
+MACHINE       = 
+
+# Startup code for the DLL (for example C0D32.obj)
+STARTUP      = C0D32.obj
+
+# Import library
+IMPORT       = IMPORT32.lib
+
+# Runtime library
+RUNTIME      = CW32MT.lib
+
+# Linker options
+LOPT      = 
+
+# C compiler flags
+CFLAGS    =  -c -w- $(OPTS)
+
+# SWIG Installation
+SWIG      = c:\swig1.1\swig
+
+# Now munge the files provided
+# SRCS     = list of source files
+# WRAPFILE = Outfile file for SWIG
+
+SRCS         = $(SRCS) $(WRAPFILE)
+
+# Get rid of /Tp option from Visual C++ and change it to -P for BC++
+RSRCS        = $(SRCS:/Tp=-P )
+
+# Form object files
+CXXOBJS        = $(SRCS:.cxx=.obj) 
+COBJS          = $(CXXOBJS:.c=.obj)
+OBJS           = $(COBJS:/Tp=)
+
+
+# ------------------------------------------------------------------
+# Tcl settings
+# 
+# TCL_INCLUDES  = Include files for your Tcl installation.
+#                 Typically you want Tcl/generic and Tcl/win.
+# TCLLIB        = The location of the tcl library
+# ------------------------------------------------------------------
+
+TCL_INCLUDES  = -Id:\tcl8.0\generic -Id:\tcl8.0\win
+TCLLIB         = d:\tcl8.0\win\tcl80.lib
+
+tcl::
+	echo $(OBJS)
+	$(SWIG) -tcl -o $(WRAPFILE) $(SWIGOPT) $(INTERFACE)
+	$(CC) $(CFLAGS) -DWIN32 $(TCL_INCLUDES) $(RSRCS) 
+# This is a gross hack to generate a configuration file since the command line doesn't
+# seem to work
+	@echo /Tpd /L"$(TOOLS)\lib" /j"$(TOOLS)\lib" $(STARTUP) +> tlink32.cfg
+	@echo $(OBJS),+>> tlink32.cfg
+	@echo $(TARGET),,+>> tlink32.cfg
+	@echo $(IMPORT) $(RUNTIME) $(TCLLIB)+>> tlink32.cfg
+	$(LINK) @tlink32.cfg 
+	@del tlink32.cfg
+
+# ------------------------------------------------------------------
+# Python settings
+# 
+# PY_INCLUDES  = Include files for your Python installation.  Typically
+#                you need the python-1.5\Include python-1.5\ and python-1.5\PC
+#                directories here.
+# PYLIB        = The location of the Python library
+# ------------------------------------------------------------------
+
+
+PY_INCLUDES  = -Id:\python-1.5\Include -Id:\python-1.5 -Id:\python-1.5\PC
+PYLIB        = d:\python-1.5\PCbuild\Debug\python15.lib
+PYFLAGS      = /D __WIN32__
+
+python::
+	@echo Borland makefile for Python extensions not implemented yet.
+
+# ------------------------------------------------------------------
+# Perl settings
+# 
+# PERL_INCLUDE = Include files for your Perl installation
+# PERLLIB      = The location of the Perl library
+# PERLFLAGS    = Perl specific compilation flags
+# ------------------------------------------------------------------
+
+# These are for Perl5.004 
+PERL_INCLUDE = -Ic:\packages\borland\perl\lib\CORE 
+PERLLIB      = c:\packages\borland\perl\lib\CORE\perl.lib
+PERLFLAGS    = /DWIN32 /DMSWIN32 /DWIN32IO_IS_STDIO 
+
+perl::
+	echo $(OBJS)
+	$(SWIG) -perl5 -o $(WRAPFILE) $(SWIGOPT) $(INTERFACE)
+	$(CC) $(CFLAGS) -DWIN32 $(PERL_INCLUDE) $(PERLFLAGS) $(RSRCS) 
+# This is a gross hack to generate a configuration file since the command line doesn't
+# seem to work
+	@echo /Tpd /L"$(TOOLS)\lib" /j"$(TOOLS)\lib" $(STARTUP) +> tlink32.cfg
+	@echo $(OBJS),+>> tlink32.cfg
+	@echo $(TARGET),,+>> tlink32.cfg
+	@echo $(IMPORT) $(RUNTIME) $(PERLLIB)+>> tlink32.cfg
+	$(LINK) @tlink32.cfg 
+	@del tlink32.cfg
+
+clean::
+	del *.obj
+	del *.dll
+	del *.exp
+	del *.lib
+	del *.pdb
+	del *.map
+	del *_wrap*
+	del *~
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

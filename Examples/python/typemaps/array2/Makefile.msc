@@ -1,0 +1,7 @@
+SRCS      = array.c
+INTERFACE = array.i
+WRAPFILE  = array_wrap.c
+TARGET    = carray.dll
+
+!include ..\..\..\..\Makefile.win
+

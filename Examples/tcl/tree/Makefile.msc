@@ -1,0 +1,7 @@
+SRCS      = tree.c
+INTERFACE = tree.i
+WRAPFILE  = tree_wrap.c
+TARGET    = tree.dll
+
+!include ..\..\..\Makefile.win
+

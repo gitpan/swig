@@ -1,0 +1,54 @@
+Dave's "To do" list (feel free to jump in and do any one of these
+things if you're so inclined).
+
+- Write on a FAQ (or find a volunteer willing to maintain one).
+
+- Work on the SWIG library.   (Ongoing)
+
+- Improve support for using SWIG with multiple files.  There
+  are still some problems with C++ and multiple files.
+
+- Write a typemap library for handling arrays, lists, and other
+  useful objects.
+
+- Continued improvements to C++
+
+     -  Function overloading
+     -  Templates (partially supported now)
+     -  Operator overloading
+
+- Support of Objective-C protocols.
+
+- The great Parser rewrite (in progress).
+
+- Work on a way to turn the SWIG library into a collection
+  of pre-built modules for various scripting languages.
+
+- Preprocessor tools.   Might be possible to create some
+  tools for creating interface files from highly cluttered
+  header files.
+
+- Modify SWIG to look in the Windows Registry for default
+  settings.
+
+- Continued development of the experimental MATLAB module.
+
+- Bring the Guile module up to speed with the latest version
+  of FSF Guile.  It basically needs an entire rewrite.
+
+Big projects (for people with lots and lots of spare time...) :
+
+- SWIG Fortran.    A Fortran front-end to SWIG language modules.
+
+- SWIG Java.  Enough said.
+
+- A Visual Basic module (or perhaps just a COM binding).
+
+- The great Parser rewrite (in progress).
+    
+- Develop a method for specifying and enforcing functional 
+  dependencies (send e-mail for more details).
+
+
+
+

@@ -1,0 +1,8 @@
+This directory contains the simple Tcl example and is primary
+used to test build versions of ish, iwish, itclsh, and itkwish.
+
+To make sure it's really working right.  Run the code example.tcl
+which uses [incr Tcl] namespaces.   If you've built these
+correctly, it should run.
+
+

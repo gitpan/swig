@@ -1,0 +1,13 @@
+This directory has two simple examples involving binary
+search trees.
+
+Type 'make tree' to build a simple tclsh only example for
+testing out the algorithms.  Run it by typing 'tree tree.tcl'.
+This example hammers on the machine for awhile so give it
+a few minutes!
+
+Type 'make findfile' to build a simple Tk application for
+searching for files.   To run it just type 'findfile.tcl'.
+
+
+

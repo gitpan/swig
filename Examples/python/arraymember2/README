@@ -1,0 +1,6 @@
+This example shows another way which can access members
+of structures using a new data, typemaps, and shadow
+classes (at the cost of being a little subtle).
+
+The script test.py can be used to test it.
+

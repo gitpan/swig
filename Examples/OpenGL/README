@@ -1,0 +1,62 @@
+SWIG OpenGL example
+
+Last update : 1/1/98
+
+This example wraps the OpenGL library using SWIG. This is
+set up to compile under Mesa 2.5.   You may have to hack the
+Makefile to get it to compile however.
+
+Windows users can also compile this example using MSVC++ 4.x and
+the Microsoft OpenGL library (see below) :
+
+UNIX
+====
+The following options are available :
+
+make tcl         Builds a version of wish with OpenGL functions
+make python      Builds a dynamically loadable Python module.
+make perl        Builds a dynamically loadable Perl5 module.
+
+Notes :
+
+1.  This example was built using the header files from Mesa 1.2.8.
+    Basically, this process involved the following :
+
+	a.  Copy the header files
+        b.  Run SWIG to find parsing problems.
+        c.  Eliminate parsing problems until errors go away.
+        d.  Compile
+
+2.  When compiling, you may get SWIG warnings about array
+    members.   This is normal.
+
+3.  The special function newfv4(w,x,y,z) is used to create a 
+small 4 element array.   You'll see it quite alot in the example
+scripts.
+
+
+Examples
+========
+The Perl, Python, and Tcl directories contain various samples
+of using the module.
+
+Windows
+=======
+
+You can compile two extensions by running nmake on the file
+'Makefile.msc'.  
+
+    nmake /f Makefile.msc tcl              - Builds Tcl Extension
+    nmake /f Makefile.msc python           - Builds a Python extension
+    nmake /f Makefile.msc perl             - Builds a Perl extension
+
+
+Post no bills
+=============
+This whole example was cooked up in an afternoon so there are many
+things that could be improved if I had more time....  this is
+primarily intended to be a SWIG example that shows how you can take
+a big library and make a module out it.  It's not a replacement for
+other more well-developed OpenGL modules already available for most
+scripting languages.
+

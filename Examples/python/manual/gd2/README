@@ -1,0 +1,6 @@
+Extended gd example from SWIG users manual.
+
+gd2.py          - Simple script that draws polygons
+image.py        - 2D imaging base class built on top of the gd module
+plotfunc.py     - Plots mathematical functions using Image base class
+plotmesh.py     - Plots triangulated mesh data using Image base class

@@ -1,0 +1,83 @@
+Tcl Examples
+
+This directory contains a variety of very simple SWIG Tcl/Tk examples.
+The examples should be compatible with Tcl 7.3, Tk 3.6 and all
+newer versions.  Most of the examples have also been tested with Tcl 8.0.
+
+Here's a short summary :
+
+simple        - Simple example from user manual.
+
+tree          - Binary search trees in Tcl.
+
+graph         - Simple code for building directed graphs
+
+except        - One possible way of generating Tcl/Tk exceptions.
+
+tcl_plugin    - Extensions to the Tcl Netscape plugin. (tested with
+                beta releases of the plugin, may not work in
+                current releases).
+
+c++           - A variety of simple C++ examples.
+
+blttix        - Shows how the SWIG library can be used to combine
+                other Tcl extensions.
+
+typemaps      - Examples showing how to use SWIG typemaps.
+
+constant      - Example using the new Tcl constant libraries.
+
+constraint    - Constraints implemented using typemaps.
+
+objc          - An objective-C example.
+
+runtime       - Example showing how to use the SWIG runtime libraries
+
+shadow        - Example using shadow classes
+
+defarg        - How to use default arguments
+
+array         - Interesting example that can manipulate C arrays
+
+
+To build each example, simply go to that directory and type 'make'.
+The following 'make' options are available :
+
+     make              - Build a dynamically loadable module compatible
+                         with Tcl 7.x or Tcl 8.x.
+
+     make tcl8         - Build a dynamically loadable module using the
+                         Tcl 8.0 object interface.
+
+     make static       - Statically rebuild tclsh/wish with the extension
+                         added (for machines without dynamic loading)
+
+     make static8      - Statically rebuild tclsh/wish, but use the
+                         Tcl 8.0 object interface.
+
+All examples rely on the file 'Makefile.template' in the top
+level directory.  If 'make' fails, you may need to edit this
+file to locate your Tcl/Tk installation.
+
+The examples will generally not compile if SWIG has not been
+installed.  To run the examples without installing SWIG,
+set the SWIG_LIB environment variable to the following :
+
+      setenv SWIG_LIB ${pathname}/SWIG1.1/swig_lib
+
+Where ${pathname} is the path where the SWIG source is located.
+
+
+
+---- Most Recent Testing Information ---
+
+Date checked : January 2, 1998
+Version      : Tcl 8.0/Tk8.0
+OS           : Linux 2.0.27
+
+Date checked : June 22, 1997
+Versions     : Tcl 7.6/Tk4.2, Tcl8.0b1/Tk8.0b1
+OS           : Linux 2.0.28, Irix 6.2, MkLinux DR2.1
+               Windows NT 4.0.
+
+

@@ -1,0 +1,8 @@
+SRCS      = 
+INTERFACE = vector.i
+WRAPFILE  = vector_wrap.cxx
+TARGET    = vector.dll
+SWIGOPT   = -c++
+
+!include ..\..\..\..\Makefile.win
+

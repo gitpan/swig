@@ -1,0 +1,8 @@
+SRCS      = 
+INTERFACE = amember.i
+WRAPFILE  = amember_wrap.cxx
+TARGET    = amember.dll
+SWIGOPT   = -shadow 
+
+!include ..\..\..\..\Makefile.win
+

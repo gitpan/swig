@@ -1,0 +1,13 @@
+This example shows how SWIG can be used to combine different Tcl
+extensions.   In this case, Tix and BLT have been combined
+into a single wish executable.
+
+You may have to edit the Makefile to find your local copies
+of Tix and BLT.
+
+'example.tcl' is a very rudimentary example that creates both
+a Tix and BLT widget.
+
+I have only tested this with Tcl 7.6/Tk 4.2.  It is unlikely
+to work with newer or older versions of Tcl/Tk.
+

@@ -1,0 +1,8 @@
+This example shows how one might pass C structures to and
+from Tcl as lists instead of pointers using typemaps.
+
+In this case, we'll parse the /etc/passwd file and convert it
+to and from a C representation.
+
+
+

@@ -1,0 +1,11 @@
+This is an extremely simple example to test building a C++
+module with Perl5.  It has a simple class with some inheritance.
+See the file 'shapes.pl' to see how it can be used.
+
+Note : The file "proto.h" in the Perl5.003 causes compiler errors
+on some C++ compilers.   To get this to compile you may need to
+edit Makefile.template so that the option '-Dexplicit=' appears
+on the compile line.
+
+
+

@@ -1,0 +1,145 @@
+// ----------------------------------------------------------------------
+// MATLAB.map
+// Dave Beazley
+// Copyright (C) 1997
+// All Rights Reserved
+//
+// This file contains SWIG mappings for MATLAB cmex functions
+// ----------------------------------------------------------------------
+
+// ---------------------------- Function inputs -------------------------
+
+%typemap(in) int               SWIG_DEFAULT_TYPE,
+             short             SWIG_DEFAULT_TYPE,
+             long              SWIG_DEFAULT_TYPE,
+             unsigned int      SWIG_DEFAULT_TYPE,
+             unsigned short    SWIG_DEFAULT_TYPE,
+             unsigned long     SWIG_DEFAULT_TYPE,
+             signed char       SWIG_DEFAULT_TYPE,
+             unsigned char     SWIG_DEFAULT_TYPE,
+             double            SWIG_DEFAULT_TYPE,
+             float             SWIG_DEFAULT_TYPE
+{
+  int m,n;
+  double *p;
+  m = mxGetM($source);
+  n = mxGetN($source);
+  if (!mxIsNumeric($source) || mxIsComplex($source) ||
+      mxIsSparse($source) || !mxIsDouble($source) ||
+      !(m==1 && n==1)) {
+    mexErrMsgTxt("Argument must be a scalar\n");
+  }
+  p = mxGetPr($source);
+  $target = ($type) (*p);
+}
+
+%typemap(in) char *            SWIG_DEFAULT_TYPE
+{
+  int len,status;
+  len = (mxGetM($source)*mxGetN($source))+1;
+  $target = mxCalloc(len,sizeof(char));
+  status = mxGetString($source,$target,len);
+  if (status) 
+    mexErrMsgTxt("Unable to convert string data");
+}
+
+%typemap(in) User *           SWIG_DEFAULT_TYPE
+{
+  int len, status;
+  char *ptr;
+  len = (mxGetM($source)*mxGetN($source))+1;
+  ptr = mxCalloc(len,sizeof(char));
+  status = mxGetString($source,ptr,len);
+  if (status) 
+    mexErrMsgTxt("Unable to convert string data");
+  if (SWIG_GetPtr(ptr,(void **) &$target, "$mangle")) {
+    mexErrMsgTxt("Type error. Expected a $mangle");
+  }
+}
+
+%typemap(in) void *           SWIG_DEFAULT_TYPE
+{
+  int len, status;
+  char *ptr;
+  len = (mxGetM($source)*mxGetN($source))+1;
+  ptr = mxCalloc(len,sizeof(char));
+  status = mxGetString($source,ptr,len);
+  if (status) 
+    mexErrMsgTxt("Unable to convert string data");
+  if (SWIG_GetPtr(ptr,(void **) &$target, 0)) {
+    mexErrMsgTxt("Type error. Expected a $mangle");
+  }
+}
+
+// ---------------------------- Function outputs -------------------------
+
+%typemap(out) int               SWIG_DEFAULT_TYPE,
+              short             SWIG_DEFAULT_TYPE,
+              long              SWIG_DEFAULT_TYPE,
+              unsigned int      SWIG_DEFAULT_TYPE,
+              unsigned short    SWIG_DEFAULT_TYPE,
+              unsigned long     SWIG_DEFAULT_TYPE,
+              signed char       SWIG_DEFAULT_TYPE,
+              unsigned char     SWIG_DEFAULT_TYPE,
+              double            SWIG_DEFAULT_TYPE,
+              float             SWIG_DEFAULT_TYPE
+{
+  double *p;
+  $target = mxCreateDoubleMatrix(1,1,mxREAL);
+  p = mxGetPr($target);
+  *p = (double) $source;
+}
+
+%typemap(out) char *  SWIG_DEFAULT_TYPE 
+{
+  $target = mxCreateString($source);
+}
+
+%typemap(out) User *  SWIG_DEFAULT_TYPE,
+              void *  SWIG_DEFAULT_TYPE 
+{
+  char temp[64];
+  SWIG_MakePtr(temp,(void *) $source, "$mangle");
+  $target = mxCreateString(temp);
+}
+
+// ------------------------------ Constants -----------------------------
+
+%typemap(const) int               SWIG_DEFAULT_TYPE,
+                short             SWIG_DEFAULT_TYPE,
+                long              SWIG_DEFAULT_TYPE,
+                unsigned int      SWIG_DEFAULT_TYPE,
+                unsigned short    SWIG_DEFAULT_TYPE,
+                unsigned long     SWIG_DEFAULT_TYPE,
+                signed char       SWIG_DEFAULT_TYPE,
+                unsigned char     SWIG_DEFAULT_TYPE,
+                double            SWIG_DEFAULT_TYPE,
+                float             SWIG_DEFAULT_TYPE
+{
+  double *p;
+  mxArray *m = mxCreateDoubleMatrix(1,1,mxREAL);
+  p = mxGetPr(m);
+  *p = (double) $value;
+  mxSetName(m, "$target");
+  mexPutMatrix(m);
+}
+
+%typemap(const) char * SWIG_DEFAULT_TYPE 
+{
+  mxArray *m = mxCreateString("$value");
+  mxSetName(m,"$target");
+  mexPutMatrix(m);
+}
+
+%typemap(const) User * SWIG_DEFAULT_TYPE
+{
+  char temp[80];
+  mxArray *m;
+  SWIG_MakePtr(temp,(void *) $value, "$mangle");
+  m = mxCreateString(temp);
+  mxSetName(m,"$target");
+  mexPutMatrix(m);
+}
+
+
+

@@ -1,0 +1,8 @@
+First gd-1.2 example from user manual.  Run the script gd1.py
+to see a sample.
+
+This example requires the gd-1.2 library which is freely available
+from a number of FTP sites.  You may need to edit the Makefile so
+that the compiler can find it.
+
+

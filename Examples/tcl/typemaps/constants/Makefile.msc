@@ -1,0 +1,7 @@
+SRCS      = 
+INTERFACE = const.i
+WRAPFILE  = const_wrap.c
+TARGET    = constant.dll
+
+!include ..\..\..\..\Makefile.win
+

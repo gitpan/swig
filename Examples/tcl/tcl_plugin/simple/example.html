@@ -1,0 +1,46 @@
+<Html>
+<Head>
+<Title>Tcl Evaluator-In-A-Page</Title>
+<!-- Author: bwelch -->
+<!-- Modified by : Dave Beazley -->
+</Head>
+<Body bgcolor="#ffffff">
+
+<h1>Simple SWIG Example </h1>
+
+Below is a little evaluator for Tcl commands. Type any valid Tcl command
+in and see the result immediately. (you can create Tk widgets too).  SWIG
+allows you to dynamically load C extensions into the Tcl/Tk Netscape
+plugin.  To see how this works, type the following commands in the
+window below.   You should be able to access any of the commands
+in the simple example code.
+
+<blockquote>
+<tt> <pre>
+load ./example.so example
+fact 4
+mod 9 3
+get_time
+source test.tcl
+</pre> </tt>
+</blockquote>
+
+<br>
+<embed src=eval.tcl width=400 height=200 JUNK=7 junk=8>
+<p>
+ 
+<p>
+
+<h3> Important Security Note </h3>
+
+In order for the "load" command to work properly, you need
+to install the supplied version of the file "safe.tcl" into the
+directory <tt> ~/.tclplug/tcl7.6 </tt>.   This modification relaxes
+the Tcl/Tk plugin security policy by allowing you to load dynamic
+extensions, source Tcl scripts, and open files in the current directory
+(wherever you started Netscape 3.0).    This is primarily provided
+to make it easier to play around with the plugin.
+
+</Body>
+</Html>
+

@@ -1,0 +1,8 @@
+SRCS      = foo.c
+INTERFACE = callback.i
+WRAPFILE  = callback_wrap.c
+TARGET    = callback.dll
+SWIGOPT   = 
+
+!include ..\..\..\Makefile.win
+

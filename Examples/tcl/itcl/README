@@ -1,0 +1,5 @@
+Eventually, this directory will contain a few [incr Tcl] 
+examples.   For now, the "simple" directory contains a 
+simple example and builds of ish, iwish, itclsh, and
+itkwish to make sure that the compilation process actually
+works.

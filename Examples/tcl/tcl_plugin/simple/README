@@ -1,0 +1,13 @@
+
+This builds a simple example.
+
+1.  Type 'make'
+
+2.  Now run Netscape Navigator 3.0 on the file example.html
+
+	'nav3 example.html'
+
+If 'make' fails, you might need to edit the file 'Makefile.template'
+in SWIG's top level directory.
+
+

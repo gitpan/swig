@@ -1,0 +1,8 @@
+SRCS      = 
+INTERFACE = arraymember.i
+WRAPFILE  = arraymember_wrap.c
+TARGET    = arraymemberc.dll
+SWIGOPT   = -shadow
+
+!include ..\..\..\Makefile.win
+

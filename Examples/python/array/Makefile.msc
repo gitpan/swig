@@ -1,0 +1,9 @@
+SRCS      = 
+INTERFACE = array.i
+WRAPFILE  = array_wrap.cxx
+TARGET    = darrayc.dll
+SWIGOPT   = -c++ -shadow
+OPTS      = -GX
+
+!include ..\..\..\Makefile.win
+

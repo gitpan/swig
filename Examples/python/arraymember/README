@@ -1,0 +1,8 @@
+This example shows one way one could go about accessing
+members of structs that are arrays.
+
+Typemaps can also be used to achieve similar effects.
+
+Run the arraytest.py script to test.
+
+

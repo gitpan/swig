@@ -1,0 +1,5 @@
+Example from SWIG user manual.  Using __getitem__ and
+__setitem__ methods to make our grid structure look like
+a Python array.
+
+ex7.py       - Sample code

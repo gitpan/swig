@@ -1,0 +1,4 @@
+This example shows how to pass a Perl array into a char **,
+but with a slight modification that returns a char ** as a
+comma separated list.
+

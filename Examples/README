@@ -1,0 +1,152 @@
+Examples README
+January 4, 1998
+-------------------------------------------------------------
+
+This directory contains a examples for all of the currently
+supported target languages.   Examples are self-contained in
+a subdirectory corresponding to the language you are using.
+The OpenGL and GIFPlot directories contain more sophisticated
+examples of SWIG that compile under multiple scripting languages.
+
+How to run (Unix)
+-----------------
+
+Most of the examples rely on the file "Makefile.template" located in
+the top level of the SWIG distribution.  You may have to edit this
+file to get it to work (although some of it gets set automatically by
+configure).  Assuming that it is set up correctly, you should be able
+to simply type "make" in an appropriate directory.
+
+How to run (Windows NT)
+-----------------------
+
+Most examples rely upon the file "Makefile.win" located in the top
+level of the SWIG distribution.   If you are using Visual C++, copy
+the file 'Makefile.win.vc' to 'Makefile.vc'.   If using Borland C++,
+copy the file 'Makefile.win.bc' to 'Makefile.win'.   Next, edit
+this file to reflect the setup on your machine including the
+location of various packages such as Tcl, Perl, and Python, and the
+location of your C++ compiler.
+
+Most of the examples have been tested with Microsoft Visual C++ 4.0.
+A subset of the examples have been tested with Visual C++ 5.0 and
+and even smaller set have been tested with Borland C++ 5.2.   Your
+mileage may vary.
+
+Notable Examples
+----------------
+The OpenGL and GIFPlot directories show how multiple scripting
+languages can be used with the same package.  This examples are 
+also significantly larger than the others.
+
+The 'lang' subdirectory shows how you can write a new SWIG
+language module.
+
+The 'MATLAB' subdirectory contains an experimental SWIG module for
+making MATLAB 5.0 native wrappers (ie. using SWIG to add C functions
+directly to MATLAB).
+
+Last Tested : January 4, 1998
+------------------------------
+All of the examples are tested before each release.   The primary test
+platforms are Linux and Windows-NT.  Configuration for last test :
+
+Unix:
+      - Linux 2.0.28, Irix 6.2, Solaris 2.5, MkLinux DR2.1
+      - gcc 2.7.2, cc (SGI), DCC (SGI), CC (Solaris)
+      - Tcl 8.0/Tk8.0
+      - Python 1.4 and 1.5
+      - Perl 5.003, 5.004, 5.004_04.
+
+Windows:
+      - MS Visual C++ 4.0
+      - MS Visual C++ 5.0
+      - Borland C++ 5.2
+      - Windows NT 4.0
+      - Tcl 8.0/Tk8.0
+      - Python 1.5
+      - Activeware Perl for Win32 (Build 315)
+      - Perl5.004_04
+
+Known Bugs (1/4/98)
+--------------------
+-  Not all examples build under Windows NT due to Unix dependencies.
+-  Examples/perl5/typemaps/file fails under NT for unknown reasons.
+-  Examples/tcl/c++/list fails under NT and Visual C++ 5.0.
+-  Examples/tcl/typemaps/argv fails under NT and Borland C++ 5.2.
+
+Note 
+----
+Some SWIG examples, particularly those related to 3rd party packages
+such as OpenGL may take some hacking to get compiled on your machine.
+Hopefully the other examples will work, but you should plan on having
+to do some minor tweaking of Makefiles here and there.
+
+Changes (Version 1.1p4)
+-----------------------
+1. Added Perl examples to the GIFPlot and OpenGL directories.
+
+2. Restructured the OpenGL example to be a little easier to build
+   and use.
+
+3. Added partial support for Borland C++ builds.
+
+
+Changes (Version 1.1 Final)
+---------------------------
+
+1. Added 'lang' directory showing how to build a new SWIG language
+   module.
+
+2. Added 'MATLAB' directory.  This contains an experimental SWIG
+   language module for making native MATLAB cmex wrappers with SWIG.
+
+3. Examples added for showing how to use the SWIG runtime libraries.
+
+Changes (Version 1.1 Beta 6)
+-----------------------------
+1.  More examples for typemaps and other new SWIG features.
+
+2.  Added Windows-NT makefiles for almost all of the examples
+    (still missing some here and there).
+
+3.  Removed MATLAB example because it was horribly out of date.  Will
+    reappear in a later release.
+
+Changes (Version 1.1 Beta)
+-------------------------
+
+1.  More Perl5 examples---particularly related to shadow classes
+
+2.  Perl and Python examples now have the option of being built
+    as both dynamic and static extensions.
+
+3.  A few more Python examples
+
+4.  Minor cleanup here and there
+
+5.  More examples will be provided with 1.1 final.
+
+
+Changes (Version 1.0)
+---------------------
+
+1.  More examples (in Python and Perl5 in particular)
+2.  Some more C++ examples.
+3.  Fixed all of the makefiles to rely on a common makefile.
+4.  Brought the examples up to SWIG 1.0 Final compatibility 
+    (some still used obsolete features from 0.1alpha--yikes!).
+4.  Minor cleanup and lots of little bug fixes.
+
+Changes (since 1.0 Beta 3)
+--------------------------
+1. Added c++ directory
+2. Added OpenGL directory
+3. Added MATLAB example.
+4. Changed examples to use "swig" command instead of "wrap"
+
+
+
+
+
+

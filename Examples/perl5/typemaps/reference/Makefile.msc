@@ -1,0 +1,7 @@
+SRCS      = /Tpexample.c
+INTERFACE = output.i
+WRAPFILE  = output_wrap.cxx
+TARGET    = output.dll
+
+!include ..\..\..\..\Makefile.win
+

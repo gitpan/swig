@@ -1,0 +1,2 @@
+This example shows how typemaps can be used to tell SWIG to
+ignore an argument and set it to some default value.

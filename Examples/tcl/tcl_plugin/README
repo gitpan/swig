@@ -1,0 +1,207 @@
+SWIG Tcl/Tk Plugin Module
+
+Copyright (C) 1997
+Dave Beazley
+March 7, 1997
+
+Note :
+------
+
+This was first released as a separate module to SWIG 1.0b3.   It is now
+included in the standard SWIG Tcl module.  Just do the following :
+
+	swig -tcl -plugin interface.i
+
+
+DISCLAIMER :
+------------
+
+This is a *SUPER* experimental module.  USE AT YOUR OWN RISK!!!!!
+
+IN NO EVENT SHALL THE AUTHOR, THE UNIVERSITY OF CALIFORNIA, THE 
+UNIVERSITY OF UTAH OR DISTRIBUTORS OF THIS SOFTWARE BE LIABLE TO ANY
+PARTY FOR DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL
+DAMAGES ARISING OUT OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION,
+EVEN IF THE AUTHORS OR ANY OF THE ABOVE PARTIES HAVE BEEN ADVISED OF
+THE POSSIBILITY OF SUCH DAMAGE.
+
+THE AUTHOR, THE UNIVERSITY OF CALIFORNIA, AND THE UNIVERSITY OF UTAH
+SPECIFICALLY DISCLAIM ANY WARRANTIES,INCLUDING, BUT NOT LIMITED TO, 
+THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+PURPOSE. THE SOFTWARE PROVIDED HEREUNDER IS ON AN "AS IS" BASIS, AND 
+THE AUTHORS AND DISTRIBUTORS HAVE NO OBLIGATION TO PROVIDE MAINTENANCE,
+SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
+
+Introduction :
+--------------
+This example shows you how to build C extensions for the Tcl/Tk Netscape
+plugin.  In other words, you can install your own C code into Netscape
+and build cool applications. In order to use this package, you will
+need to have SWIG1.x already installed on your machine.
+
+SWIG can be retrieved at :
+
+	ftp://ftp.cs.utah.edu/pub/beazley/SWIG
+
+More information is also available at :
+
+	http://www.cs.utah.edu/~beazley/SWIG
+
+Installation :
+--------------
+
+0.  First, you need to get Netscape Navigator 3.0.  
+  
+1.  Next, you need to get the netscape plugin from Sun. Go
+    to http://www.sun.com for more information.  Follow it's
+    installation instructions precisely!
+
+2.  Make sure SWIG is installed and working.  Two simple examples
+    are provided in the directories "simple" and "graph".  Go into
+    those directories in order to play  with them.  In order to
+    use the examples, you should be able to  just type "make".  
+    The makefiles rely on "Makefile.template" in the top level 
+    SWIG directory so you may need to modify that
+    if this should fail.  As far as I know, this example only
+    works if you have tcl7.5 and tk4.1 or later installed on 
+    your machine.
+
+How to build an extension for the plugin
+----------------------------------------
+
+SWIG uses the same process as used for building a Tcl7.5 dynamic
+loadable module.  However, there are a number of key differences :
+
+1.   SWIG creates an initialization function called 
+     Module_SafeInit() which is needed by the safe interpreter
+     used in the plugin.
+
+2.   You must define a symbol SAFE_SWIG in your SWIG interface
+     files in order for them to work.    For example :
+
+	%module example
+        %{
+	#define SAFE_SWIG
+	%}
+
+	...
+  
+     Primarily this is a reminder that you are, in fact, adding
+     C functions to a Safe Tcl interpreter.
+	   
+3.   Be sure to include the Tcl7.5 header files.
+
+4.   When building the module, make sure you link with
+     the netscape plugin module as follows (for Solaris):
+
+     ld -G example.o $(HOME)/.netscape/plugins/libtclplugin.so -o example.so
+
+How to use your extension module
+--------------------------------
+
+Note : This has only been tested with version 1 of the plugin.  
+
+1.   Copy the shared library created by SWIG into the ~/.tclplug/tcl7.7 
+     directory created by the plugin.
+
+2.   Use the following Tcl command in your scripts :
+
+           load $tcl_library/example.so example
+
+     By default, the plugin will only load extensions and execute scripts
+     in the plugin directory so you must copy all files that you will use
+     to that location.
+
+3.   Alternatively, for debugging purposes, you can modify the first part of 
+     the file ~/.tclplug/tcl7.7/safe.tcl by appending the current working
+     directory to the search path.   This will look something like the
+     following :
+
+# ----- clip ----
+
+# This is the default list of directories from which safe interpreters
+# can source files. Add to this list with lappend.
+
+set tcl_safe_source_dirs(___DEFAULT___) [list $tcl_library]
+if {[info exists tk_library]} {
+    lappend tcl_safe_source_dirs(___DEFAULT___) $tk_library
+}
+lappend tcl_safe_source_dirs(___DEFAULT___) [pwd]    # ADD THIS
+
+# This is the default list of directories from which safe interpreters
+# can open files for reading. Add to this list with lappend.
+
+set tcl_safe_read_dirs(___DEFAULT___) [list $tcl_library]
+if {[info exists tk_library]} {
+    lappend tcl_safe_read_dirs(___DEFAULT___) $tk_library
+}
+lappend tcl_safe_read_dirs(___DEFAULT___) [pwd]      # ADD THIS
+
+# This is the default list of directories from which safe interpreters
+# can load extensions. Add to this list with lappend.
+
+set tcl_safe_load_dirs(___DEFAULT___) [list $tcl_library]
+if {[info exists tk_library]} {
+    lappend tcl_safe_load_dirs(___DEFAULT___) $tk_library
+}
+lappend tcl_safe_load_dirs(___DEFAULT___) [pwd]     # ADD THIS
+
+# ---- Clip ----
+
+4.  When using the above modified version of safe.tcl, Tcl will
+    be able to load extensions and scripts from the same directory
+    as you started Netscape.
+
+Uses for a SWIG generated plugin
+--------------------------------
+SWIG allows you to extend the Tcl/Tk plugin with C functions.  One
+possible use for this is to offload computationally intensive
+operations onto a client machine including access to C libraries,
+databases, and other applications from within a HTML document.  This
+is probably more useful for creating specialized applications that you
+might want to perform on a local or internal network. 
+
+Known Problems and Limitations
+------------------------------
+1. This module is only known to work with Unix versions of the plugin
+   although it may work with Windows and Mac.
+
+2. C extensions shouldn't make output to stdout or rely on stdin.
+
+3. There are potential incompatibilities between some functions
+   defined in the Tcl7.5 header file and those used in the Netscape
+   plugin.   Don't expect everything to work.
+
+SPECIAL SECURITY NOTE 
+---------------------
+
+**** CAUTION ****
+
+SWIG allows you to wrap almost any C function into a module.   Therefore,
+if you do something like wrap the "exec" function or other low-level
+system operation, you are asking for trouble.   Don't say I didn't warn
+you!!!!!
+
+SWIG generated extensions to the plugin will only work if they are on
+a local machine and in the same directory as where you started
+Netscape.  They are not transmitted as part of a Netscape document and
+pose no risk to other users.  In order for others to use a SWIG
+extension, a user must explicitly download it first. However, just as
+you shouldn't accept candy from strangers, do not accept C extensions to
+the plugin from people you don't know!
+
+UNDER NO CIRCUMSTANCES, WILL THE AUTHOR, THE UNIVERSITY OF UTAH, THE
+UNIVERSITY OF CALIFORNIA, OR SUN MICROSYSTEMS BE HELD LIABLE FOR DAMAGES
+ARRISING FROM THE USE OF THIS SOFTWARE.
+
+****************************
+
+Ahem, with that little legal matter out of the way, have fun.
+
+
+
+    
+
+
+		
+

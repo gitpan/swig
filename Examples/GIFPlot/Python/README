@@ -1,0 +1,34 @@
+This directory contains a variety of Python examples.  Some files are
+import modules loaded by other examples in this directory.  See the list
+below for a description.
+
+simple.py       A simple Python script that draws an image and save it
+                to a file.
+
+image.py        These three files define a collection of base classes
+image2d.py      for making 2D and 3D plots.   These extend the C library
+image3d.py      with functions for drawing tickmarks, axis, annotation,
+                and other capabilities.    They also show how one can
+                inherit from C structures in Python.
+
+plotfunc.py     Plots a simple function using the image base classes. Run
+                Python on this file to run.
+
+plotmesh.py     Reads a finite-element mesh and makes a series of plots.
+
+weblog.py       Reads a web-server log and makes a collection of 2D and 3D
+                plots.
+
+scene.py        Creates a simple 3D image.
+
+plotfunc3d.py   Makes a collection of 3D function plots.
+
+
+Note : Some of these scripts read data located in the Data directory.  You
+may need to modify some of these scripts on non-Unix platforms.
+
+To view images, use any GIF compatible viewer such as 'xv'.  It is also
+possible to interactively play with many of the scripts.  If you run xv
+with the -poll option, it will automatically update an image each time the
+file changes--allowing you to mess around and watch your changes.
+

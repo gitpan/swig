@@ -1,0 +1,81 @@
+GIFPlot 0.2
+
+Dave Beazley
+Theoretical Division (T-11)
+Los Alamos National Laboratory
+Los Alamos, New Mexico  87545
+beazley@lanl.gov
+
+(C) 1995-1997 University of Utah and the Regents of the
+University of California.
+
+GIFPlot is a graphics library for building simple image generation
+tools.  The library consists primarily of a 2D and 3D plotting
+primitives that may eventually be used to build a more sophisticated
+package.  Output is in the form of uncompressed GIF files.
+
+"GIFPlot" is only a working name right now.  I need to come
+up with something cooler (suggestions welcome).
+
+*** Note *** 
+
+Due to the Unisys enforcement of the LZW compression patent, this
+version only produces uncompressed GIF images.
+
+Introduction
+============
+
+GIFPlot is a relatively simple graphics library for making 2D and
+3D images.
+
+This example shows how SWIG can be used to produce scripting interfaces
+to a real software package.   The Tcl, Python, and Perl directories
+contain makefiles and examples for those languages.   The scripting
+interface is completely generated from a common SWIG interface file 
+found in the "Interface" directory.   
+
+Getting all of the pieces of this example to work will likely require
+some Makefile hacking.  If you haven't used SWIG before, you may want
+to play around with some simple examples first.
+
+Installation
+=============
+
+1.   How to install (UNIX)
+
+GIFPlot creates a C library.   To build the package type :
+
+	./configure
+	make
+
+This will create a library in this directory for use.
+
+2.  Documentation
+
+Documentation is available as an HTML file in the Doc directory.
+
+3.  Examples
+
+Several C examples are available in the Examples directory.
+
+4.  SWIG Examples
+
+This example is provided with the SWIG distribution to demonstrate
+a more sophisticated application with a variety of features.  The
+subdirectories "Tcl", "Python", and "Perl" build different interfaces
+to this package.  Makefiles are also provided for Unix, Win95/NT, and
+Macintosh.
+
+Windows Users
+==============
+
+1.  Go to the 'Lib' and type 'nmake /f Makefile.msc' to build the
+    GIFPlot library.
+
+2.  Go to the 'Tcl', 'Python', or 'Perl' libraries to build SWIG
+    examples.   The file 'Makefile.msc' in each directory is
+    used to build extensions.
+
+Bug reports, suggestions for improvements, and questions should be
+send to beazley@cs.utah.edu.
+

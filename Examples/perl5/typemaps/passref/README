@@ -1,0 +1,6 @@
+This example show how you can fake a Perl reference
+into looking like a C reference and having the C code
+directly modify the corresponding Perl variable.
+
+Note : This is inherently risky, but kind of cool.
+

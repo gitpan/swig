@@ -1,0 +1,33 @@
+** Disclaimer **
+This example demonstrates some of the more advanced features
+of SWIG--don't say I didn't warn you!
+
+In this example, we've built a simple C++ widget for making
+2D plots.   The widget is really just a wrapper around some
+functions in the gd-1.2 library (for simplicity). However,
+the C++ widget relies on callback functions written in
+C++.   To work around this problem, this example illustrates
+how to :
+
+1.  Implement a C/C++ callback function in Python
+    (without C/C++ knowing about it).
+
+2.  Use of SWIG typemaps to allow a Python
+    callable object to be passed in as a function
+    argument as well as mapping Python file objects into
+    the FILE * datatype.
+
+3.  Adding new methods to a C++ class.
+
+More details about this can be found in the SWIG user's manual.
+
+
+Notes :
+
+'make ccode' builds a C++ only implementation where our
+"widget" is used from a simple C++ program.
+
+'make' or 'make static' builds a Python implementation
+that uses the same C++ widget, but with callback functions
+written in Python.
+

@@ -1,0 +1,38 @@
+*** Disclaimer *** This is an advanced example that may not work in
+the same way on all machines.  Currently the makefile is set up for
+Linux systems.
+
+Please read the 'Advanced Topics' of the SWIG User's guide
+before proceeding with this example.
+
+This example tests the SWIG Runtime library.   A common problem
+when working with C++ systems is the sharing of run-time type
+information.   In this example, we run SWIG with the '-c' option
+and consolidate the run-time type checker into a single library
+shared between all SWIG generated modules.
+
+Typing 'make' builds three independent SWIG modules corresponding
+to C++ classes and uses dynamic loading.  Each module is linked
+against the shared library 'libswigpy.so' that is used to 
+provide the SWIG runtime system.  
+
+Typing 'make static' builds three independent SWIG modules, but
+statically links them together into a single executable (this
+is done with the package.i interface file).  The final executable
+is linked against the library 'libswigpy.a'.
+
+To see if you have done everything correctly, try running
+the script 'test.py'.  If it reports no errors, things are
+working correctly.  The script 'test1.py' may be used to test
+the code when working with shadow classes.
+
+You are encouraged to play with this example. A good test to try
+is to remove the '-c' option passed to SWIG and recompile.
+If you do this, you will find that the test script no longer
+works (figuring out why is left as an exercise to the reader).
+
+
+
+
+
+

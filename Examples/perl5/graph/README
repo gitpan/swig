@@ -1,0 +1,11 @@
+This directory contains the examples from the SWIG user manual.
+
+Later parts of this example rely on the gd-1.2 library by Thomas
+Boutell and may not compile on your machine unless you have this
+library installed.  If not, you can read about it in the SWIG User's
+Manual.
+
+5/9/97-
+Makefiles for NT added.   All of the example except for the gd 
+part (graph4) now compiles under NT.
+

@@ -1,0 +1,140 @@
+# A Makefile for MSVC++ 4.x/5.x
+#
+# Location of the Visual C++ tools
+TOOLS         = $(MSVCDIR)
+
+# The C/C++ compiler
+CC            = cl.exe
+
+# The linker
+LINK          = link.exe
+
+# Include directories for your compiler
+INCLUDE32     = -I"$(TOOLS)\include"
+
+# Target machine
+MACHINE       = IX86
+
+# C Libraries needed to build a DLL
+DLLIBC        = msvcrt.lib oldnames.lib  
+
+# Other windows libraries that are apparently needed
+#WINLIB        = kernel32.lib advapi32.lib user32.lib gdi32.lib comdlg32.lib winspool.lib
+WINLIB        = kernel32.lib advapi32.lib user32.lib gdi32.lib 
+GLLIB         = opengl32.lib glu32.lib glaux.lib
+
+# Libraries common to all DLLs
+DLLLIBS       = $(DLLIBC) $(WINLIB) $(GLLIB)
+
+# Linker options
+LOPT      = -debug:full -debugtype:cv /NODEFAULTLIB /RELEASE /NOLOGO /MACHINE:$(MACHINE) -entry:_DllMainCRTStartup@12 -dll
+
+# C compiler flags
+CFLAGS    =  /Z7 /Od /WX /c  /nologo /DEBUG /D_DLL $(INCLUDE32)\GL /D__WIN32__
+
+# SWIG Installation
+SWIG      = c:\swig1.1\swig
+
+# OpenGL files
+SRCS         =
+INTERFACE    = opengl.i
+WRAPFILE     = opengl_wrap.c
+TARGET       = opengl.dll
+
+# Now munge the files provided
+# SRCS     = list of source files
+# WRAPFILE = Outfile file for SWIG
+
+SRCS         = $(SRCS) $(WRAPFILE)
+OBJS         = $(SRCS:.cxx=.obj) 
+OBJS         = $(OBJS:.c=.obj)
+OBJS         = $(OBJS:/Tp=)
+
+# ------------------------------------------------------------------
+# Tcl settings
+# 
+# TCL_INCLUDES  = Include files for your Tcl installation.
+#                 Typically you want Tcl/generic and Tcl/win.
+# TCLLIB        = The location of the tcl library
+# ------------------------------------------------------------------
+
+TCL_INCLUDES  = -Id:\tcl8.0\generic -Id:\tcl8.0\win
+TCLLIB        = d:\tcl8.0\win\tcl80.lib
+
+tcl::
+	$(SWIG) -tcl -o $(WRAPFILE) $(SWIGOPT) $(INTERFACE)
+	$(CC) $(CFLAGS) $(TCL_INCLUDES) $(SRCS) 
+	set LIB=$(TOOLS)\lib
+	$(LINK) $(LOPT) -out:Tcl\$(TARGET) $(DLLLIBS) $(TCLLIB) $(OBJS) 
+
+# ------------------------------------------------------------------
+# Python settings
+# 
+# PY_INCLUDES  = Include files for your Python installation.  Typically
+#                you need the python-1.4\Include python-1.4\ and python-1.4\PC
+#                directories here.
+# PYLIB        = The location of the Python library
+# ------------------------------------------------------------------
+
+
+PY_INCLUDES  = -Id:\python-1.5\Include -Id:\python-1.5 -Id:\python-1.5\PC
+PYLIB        = d:\python-1.5\PCbuild\Debug\python15.lib
+PYFLAGS      = 
+
+python::
+	$(SWIG) -python -o $(WRAPFILE) $(SWIGOPT) $(INTERFACE)
+	$(CC) $(CFLAGS) $(PYFLAGS) $(PY_INCLUDES) $(SRCS) 
+	set LIB=$(TOOLS)\lib
+	$(LINK) $(LOPT) -out:Python\$(TARGET) $(DLLLIBS) $(PYLIB) $(OBJS) 
+
+
+
+# ------------------------------------------------------------------
+# Perl settings
+# 
+# PERL_INCLUDE = Include files for your Perl installation
+# PERLLIB      = The location of the Perl library
+# PERLFLAGS    = Perl specific compilation flags
+# ------------------------------------------------------------------
+
+# These are for Perl5.004 
+PERL_INCLUDE = -Id:\packages\perl\lib\CORE 
+PERLLIB      = d:\packages\perl\lib\CORE\perl.lib
+PERLFLAGS    = /DWIN32 /DMSWIN32 /DWIN32IO_IS_STDIO 
+
+# Uncomment the following if you are using ActiveWare Perl for Win32
+#PERL_INCLUDE =-Id:\perl315 -Id:\perl315\inc
+#PERLLIB      = d:\perl315\Release\perl300.lib
+#PERLFLAGS    = /DWIN32 /DMSWIN32 /DPERL_OBJECT 
+
+
+perl::
+	$(SWIG) -perl5 -o $(WRAPFILE) $(SWIGOPT) $(INTERFACE)
+	$(CC) $(CFLAGS) $(PERLFLAGS) $(PERL_INCLUDE) $(SRCS) 
+	set LIB=$(TOOLS)\lib
+	$(LINK) $(OBJS) $(LOPT)  /DEBUG -out:perl\$(TARGET) $(DLLLIBS) $(PERLLIB) 
+	copy opengl.pm perl
+
+clean::
+	del *.obj
+	del *.dll
+	del *.exp
+	del *.lib
+	del *.pdb
+	del *_wrap*
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

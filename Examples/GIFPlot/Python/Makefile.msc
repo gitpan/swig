@@ -1,0 +1,62 @@
+# Makefile for building various SWIG generated extensions
+
+SRCS          = 
+IDIR          = ..\Interface
+IFILE         = gifplot
+INTERFACE     = $(IDIR)\$(IFILE).i
+WRAPFILE      = $(IFILE)_wrap.c
+WOBJS         = $(WRAPFILE:.c=.obj)
+OBJS          = $(SRCS:.c=.obj)
+
+# Location of the Visual C++ tools (32 bit assumed)
+
+TOOLS         = $(MSVCDIR)
+TARGET        = gifplotc.dll
+CC            = cl.exe
+LINK          = link.exe
+INCLUDE32     = -I"$(TOOLS)\include"
+MACHINE       = IX86
+
+# C Library needed to build a DLL
+
+DLLIBC        = msvcrt.lib oldnames.lib  
+
+# Windows libraries that are apparently needed
+
+WINLIB        = kernel32.lib advapi32.lib user32.lib gdi32.lib comdlg32.lib winspool.lib
+
+# Libraries common to all DLLs
+
+LIBS          = $(DLLIBC) $(WINLIB) ..\gifplot.lib
+
+# Linker options
+
+LOPT      = -debug:full -debugtype:cv /NODEFAULTLIB /RELEASE /NOLOGO /MACHINE:$(MACHINE) -entry:_DllMainCRTStartup@12 -dll
+
+# C compiler flags
+
+CFLAGS    = /Z7 /Od /c /W3 /nologo /G5
+
+PY_INCLUDES  = -Id:\python-1.5\Include -Id:\python-1.5 -Id:\python-1.5\PC
+PYLIB        = d:\python-1.5\PCbuild\debug\python15.lib
+INCLUDES      = -I..\Include /D__WIN32__
+
+py::
+	c:\swig1.1\swig -python -shadow -o $(WRAPFILE) $(INTERFACE)
+	$(CC) $(CFLAGS) $(INCLUDES) $(PY_INCLUDES) $(SRCS) $(WRAPFILE)
+	set LIB=$(TOOLS)\lib
+	$(LINK) $(LOPT) -out:$(TARGET) $(LIBS) $(PYLIB) $(OBJS) $(WOBJS)
+
+clean::
+	del *.obj
+	del *.dll
+	del *.pll
+	del *.lib
+	del *.exp
+	del *_wrap*
+	del *.pdb
+	del *.pch
+	del *.pm
+	del *.sl
+	del *~
+

@@ -1,0 +1,32 @@
+<html>
+<title> Directed Graph Tcl/Tk Example </title>
+<body bgcolor="#ffffff">
+<h1> Directed Graph Example </h1>
+<br>
+The following example shows a <a href="http://www.cs.utah.edu/~beazley/SWIG"> SWIG </a> generated extension for
+the Tcl/Tk Netscape plugin.   The interface is written in
+Tcl/Tk, but the underlying functionality has been implemented
+entirely in C.  (Ok, the interface is a little lame, but this
+example was only cooked up in an afternoon).
+
+<h3> Instructions </h3>
+
+<ul>
+<li> Left mouse button creates a node
+<li> Middle mouse button creates a link.  Works as follows : <br> <br>
+<ul>
+<li> Click on starting node  <img src="sel1.gif" align=top>
+<li> Move mouse to end node <img src="sel2.gif" align=top>
+<li> Click middle mouse button again <img src="sel3.gif" align=top>
+</ul>
+<li> Right mouse button will show which nodes are connected or
+the shortest path between two nodes (if selected).
+<li> The "More edges" button adds more edges to the graph using a
+transitive closure algorithm. 
+
+</ul>
+<hr>
+<embed src=graph.tcl width=500 height=500 JUNK=7 junk=8>
+</body>
+</html>
+

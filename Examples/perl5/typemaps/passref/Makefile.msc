@@ -1,0 +1,7 @@
+SRCS      = 
+INTERFACE = pass.i
+WRAPFILE  = pass_wrap.cxx
+TARGET    = passref.dll
+
+!include ..\..\..\..\Makefile.win
+

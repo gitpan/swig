@@ -1,0 +1,7 @@
+SRCS      = example.c
+INTERFACE = example.i
+WRAPFILE  = example_wrap.c
+TARGET    = example.dll
+
+!include ..\..\..\..\Makefile.win
+

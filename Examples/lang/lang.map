@@ -1,0 +1,170 @@
+// ----------------------------------------------------------------------
+// lang.map
+// 
+// This file defines all of the type-mappings for our language (TCL).  
+// A typemap of 'SWIG_DEFAULT_TYPE' should be used to create default
+// mappings.
+// ----------------------------------------------------------------------
+
+/**************************** FUNCTION INPUTS ****************************/
+
+// Integers 
+%typemap(in) int             SWIG_DEFAULT_TYPE,
+             short           SWIG_DEFAULT_TYPE,
+             long            SWIG_DEFAULT_TYPE,
+             unsigned int    SWIG_DEFAULT_TYPE,
+             unsigned short  SWIG_DEFAULT_TYPE,
+             unsigned long   SWIG_DEFAULT_TYPE,
+             signed char     SWIG_DEFAULT_TYPE,
+             unsigned char   SWIG_DEFAULT_TYPE
+{
+  int  temp;
+  if (Tcl_GetInt(interp, $source, &temp) == TCL_ERROR) return TCL_ERROR;
+  $target = ($type) temp;
+}
+
+
+// Floating point
+%typemap(in) float   SWIG_DEFAULT_TYPE,
+             double  SWIG_DEFAULT_TYPE
+{
+  double temp;
+  if (Tcl_GetDouble(interp, $source, &temp) == TCL_ERROR) return TCL_ERROR;
+  $target = ($type) temp;
+}
+
+
+// Strings
+%typemap(in) char *  SWIG_DEFAULT_TYPE
+{
+  $target = $source;
+}
+
+// void *
+%typemap(in) void *  SWIG_DEFAULT_TYPE
+{
+  if (SWIG_GetPtr($source,(void **) &$target, (char *) 0)) {
+    Tcl_SetResult(interp,"Type error.  Expected a pointer",TCL_STATIC);
+    return TCL_ERROR;
+  }
+}
+
+// User defined types and all other pointers
+%typemap(in) User * SWIG_DEFAULT_TYPE
+{
+  if (SWIG_GetPtr($source,(void **) &$target, "$mangle")) {
+    Tcl_SetResult(interp,"Type error.  Expected a $mangle",TCL_STATIC);
+    return TCL_ERROR;
+  }
+}
+
+/**************************** FUNCTION OUTPUTS ****************************/    
+
+// Signed integers
+%typemap(out) int         SWIG_DEFAULT_TYPE,
+              short       SWIG_DEFAULT_TYPE,
+              long        SWIG_DEFAULT_TYPE,
+              signed char SWIG_DEFAULT_TYPE
+{
+  sprintf($target,"%ld", (long) $source);
+}
+
+// Unsigned integers
+%typemap(out) unsigned       SWIG_DEFAULT_TYPE,
+              unsigned short SWIG_DEFAULT_TYPE,
+              unsigned long  SWIG_DEFAULT_TYPE,
+              unsigned char  SWIG_DEFAULT_TYPE
+{
+  sprintf($target,"%lu", (unsigned long) $source);
+}
+
+// Floating point
+%typemap(out) double SWIG_DEFAULT_TYPE,
+              float  SWIG_DEFAULT_TYPE
+{
+  Tcl_PrintDouble(interp,(double) $source,interp->result);
+}
+
+// Strings
+%typemap(out) char *SWIG_DEFAULT_TYPE
+{
+  Tcl_SetResult(interp,$source,TCL_VOLATILE);
+}
+
+// Pointers
+%typemap(out) User *SWIG_DEFAULT_TYPE
+{
+  SWIG_MakePtr($target,(void *) $source, "$mangle");
+}
+
+/**************************** VARIABLE CREATION ****************************/    
+
+// Integers
+%typemap(varinit) int          SWIG_DEFAULT_TYPE,
+                  unsigned int SWIG_DEFAULT_TYPE
+{
+  Tcl_LinkVar(interp, "$target", (char *) &$source, TCL_LINK_INT $status);
+}
+
+// Doubles
+%typemap(varinit) double SWIG_DEFAULT_TYPE {
+  Tcl_LinkVar(interp,"$target", (char *) &$source, TCL_LINK_DOUBLE $status);
+}
+
+// Strings
+%typemap(varinit) char * SWIG_DEFAULT_TYPE {
+  Tcl_LinkVar(interp,"$target", (char *) &$source, TCL_LINK_STRING $status);
+}
+
+/****************************** CONSTANTS **********************************/    
+
+// Signed Integers
+%typemap(const) int           SWIG_DEFAULT_TYPE,
+                short         SWIG_DEFAULT_TYPE,
+                long          SWIG_DEFAULT_TYPE,
+                signed char   SWIG_DEFAULT_TYPE
+{
+  static char *_wrap_$target;
+  _wrap_$target = (char *) malloc(40);
+  sprintf(_wrap_$target,"%ld",$value);
+  Tcl_LinkVar(interp,"$target", (char *) &_wrap_$target, TCL_LINK_STRING | TCL_LINK_READ_ONLY);
+}
+
+// Unsigned integers
+%typemap(const) unsigned        SWIG_DEFAULT_TYPE,
+                unsigned short  SWIG_DEFAULT_TYPE,
+                unsigned long   SWIG_DEFAULT_TYPE,
+                unsigned char   SWIG_DEFAULT_TYPE
+{
+  static char *_wrap_$target;
+  _wrap_$target = (char *) malloc(40);
+  sprintf(_wrap_$target,"%lu",$value);
+  Tcl_LinkVar(interp,"$target", (char *) &_wrap_$target, TCL_LINK_STRING | TCL_LINK_READ_ONLY);
+}
+
+// Doubles and floats
+%typemap(const) double SWIG_DEFAULT_TYPE,
+                float  SWIG_DEFAULT_TYPE
+{
+  static char *_wrap_$target;
+  _wrap_$target = (char *) malloc(40);
+  sprintf(_wrap_$target,"%f",$value);
+  Tcl_LinkVar(interp,"$target", (char *) &_wrap_$target, TCL_LINK_STRING | TCL_LINK_READ_ONLY);
+}
+
+// Strings
+%typemap(const) char *SWIG_DEFAULT_TYPE
+{
+  static char *_wrap_$target = "$value";
+  Tcl_LinkVar(interp,"$target", (char *) &_wrap_$target, TCL_LINK_STRING | TCL_LINK_READ_ONLY);
+}
+  
+// Pointers
+%typemap(const) User *SWIG_DEFAULT_TYPE
+{
+  static char *_wrap_$target;
+  _wrap_$target = (char *) malloc(20+strlen("$mangle"));
+  SWIG_MakePtr(_wrap_$target, (void *) $value, "$mangle");
+  Tcl_LinkVar(interp,"$target", (char *) &_wrap_$target, TCL_LINK_STRING | TCL_LINK_READ_ONLY);
+}
+

@@ -1,0 +1,8 @@
+SRCS      = 
+INTERFACE = shadow.i
+WRAPFILE  = shadow_wrap.cxx
+TARGET    = shadow.dll
+SWIGOPT   = -c++ -shadow
+
+!include ..\..\..\Makefile.win
+

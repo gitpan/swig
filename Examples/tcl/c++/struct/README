@@ -1,0 +1,11 @@
+Earlier versions of SWIG produced wrapper code that failed
+to compile when given something like this :
+
+	struct Vector {
+		double x,y,z;
+        };
+
+Since the resulting code looked for "Vector *" instead of
+"struct Vector *".   This example tests an apparent fix to
+this problem....
+

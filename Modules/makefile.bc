@@ -1,0 +1,116 @@
+# Modified from automatic creation by Pier Giorgio Esposito (mc2172@mclink.it)
+# for Borland C++ (4/20/97)
+#
+#######################################################################
+# $Header: /b11/dmb/SWIG/SWIG1.0/RCS/Makefile.in,v 1.1 1996/08/12 01:55:02 dmb Exp dmb $
+# Simplified Wrapper and Interface Generator (SWIG)
+# 
+# Makefile for version 1.0 Final
+# Dave Beazley
+# August 1, 1996
+#
+# This makefile is now mostly constructed by ./configure.
+#
+# $Log: Makefile.in,v $
+# Revision 1.1  1996/08/12 01:55:02  dmb
+# Initial revision
+#
+#######################################################################
+
+#.KEEP_STATE:
+
+!include <..\Win\make_bc.in>
+
+
+srcdir = .
+
+# Set your C++ compiler here.   g++ works on most machines,
+# but you might have to change it depending on your installation.
+#
+#
+# Set the prefix below to indicate where you want SWIG to install its
+# files.   Normally this is /usr/local
+# 
+
+# Location of the SWIG library.  Is normally put in /usr/local/lib/swig_lib
+# The SWIG library contains configuration files and library modules
+# so you should install it someplace where it can be easily accessed.
+
+
+
+########################################################################
+# Normally, you shouldn't have to change anything below this point     #
+########################################################################
+
+
+
+WRAPOBJS = swigmain.obj tcl.obj tcl8.obj perl4.obj perl5.obj python.obj \
+        pycpp.obj debug.obj guile.obj
+WRAPSRCS = swigmain.cxx tcl.cxx tcl8.cxx perl4.cxx perl5.cxx python.cxx \
+        pycpp.cxx debug.cxx guile.cxx
+WRAPHEADERS = ../Include/swig.h swigtcl.h tcl8.h perl4.h perl5.h python.h \
+        guile.h debug.h wrap.h
+
+TARGET  = ..\swig.exe
+INCLUDE = -I../Include -I../SWIG -I$(STD_INC)
+LIBNAME = ..\libswig.lib
+LIBS    = $(LIBNAME)
+
+#
+# Rules for creation of a .obj file from .cxx
+.SUFFIXES: .cxx
+.cxx.obj: 
+        $(CC) +bcc32.cfg -w- -DSWIG_LIB="\"$(SWIG_LIB)\"" -DSWIG_CC="\"$(CC)\"" $<
+
+all:    bcc32.cfg $(TARGET)
+
+bcc32.cfg: makefile.bc
+	copy &&|
+-DMSDOS
+-D_RTLDLL
+-DSTDC_HEADERS=1
+-DHAVE_LIBDL=1
+$(SWIG_OPTS)
+-I../Include
+-I../SWIG
+-I$(STD_INC)
+-WC
+-c
+-P
+| $@
+
+	
+$(TARGET): $(WRAPOBJS) $(WRAPHEADERS) $(LIBNAME)
+        $(LINK)/Tpe @&&|
+c0x32.obj    +
+swigmain.obj +
+tcl.obj      +
+tcl8.obj     +  
+perl4.obj    +
+perl5.obj    +
+python.obj   +
+pycpp.obj    +   
+debug.obj    +
+guile.obj
+$<,NUL
+$(LIBNAME) cw32i import32
+|
+
+swigmain.obj: swigmain.cxx 
+tcl.obj: tcl.cxx 
+perl4.obj: perl4.cxx 
+perl5.obj: perl5.cxx 
+python.obj: python.cxx 
+pycpp.obj: pycpp.cxx
+guile.obj: guile.cxx 
+
+Makefile:	$(srcdir)/Makefile.in ../config.status
+		(cd ..; CONFIG_FILES=Modules/Makefile $(SHELL) config.status)
+
+.PRECIOUS:	Makefile
+
+clean::
+	del *.obj 
+	del $(TARGET)
+        del bcc32.cfg
+

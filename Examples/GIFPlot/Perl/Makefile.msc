@@ -1,0 +1,71 @@
+# Makefile for building various SWIG generated extensions
+
+SRCS          = 
+IDIR          = ..\Interface
+IFILE         = gifplot
+INTERFACE     = $(IDIR)\$(IFILE).i
+WRAPFILE      = $(IFILE)_wrap.c
+WOBJS         = $(WRAPFILE:.c=.obj)
+OBJS          = $(SRCS:.c=.obj)
+
+# Location of the Visual C++ tools (32 bit assumed)
+
+TOOLS         = $(MSVCDIR)
+TARGET        = gifplot.dll
+CC            = cl.exe
+LINK          = link.exe
+INCLUDE32     = -I"$(TOOLS)\include"
+MACHINE       = IX86
+
+# C Library needed to build a DLL
+
+DLLIBC        = msvcrt.lib oldnames.lib  
+
+# Windows libraries that are apparently needed
+
+WINLIB        = kernel32.lib advapi32.lib user32.lib gdi32.lib comdlg32.lib winspool.lib
+
+# Libraries common to all DLLs
+
+LIBS          = $(DLLIBC) $(WINLIB) ..\gifplot.lib
+
+# Linker options
+
+LOPT      = -debug:full -debugtype:cv /NODEFAULTLIB /RELEASE /NOLOGO /MACHINE:$(MACHINE) -entry:_DllMainCRTStartup@12 -dll
+
+# C compiler flags
+
+CFLAGS    = /Z7 /Od /c /W3 /nologo /G5
+
+SWIG      = c:\swig1.1\swig
+
+# These are for Perl5.004 
+PERL_INCLUDE = -Id:\packages\perl\lib\CORE 
+PERLLIB      = d:\packages\perl\lib\CORE\perl.lib
+PERLFLAGS    = /DWIN32 /DMSWIN32 /DWIN32IO_IS_STDIO 
+
+# Uncomment the following if you are using ActiveWare Perl for Win32
+#PERL_INCLUDE =-Id:\perl315 -Id:\perl315\inc
+#PERLLIB      = d:\perl315\Release\perl300.lib
+#PERLFLAGS    = /DWIN32 /DMSWIN32 /DPERL_OBJECT 
+
+
+perl::
+	$(SWIG) -perl5 -shadow -o $(WRAPFILE) $(SWIGOPT) $(INTERFACE)
+	$(CC) $(CFLAGS) $(PERLFLAGS) $(PERL_INCLUDE) -I../Include $(SRCS) $(WRAPFILE)
+	set LIB=$(TOOLS)\lib
+	$(LINK) $(OBJS) $(WOBJS) $(LIBS) $(LOPT)  /DEBUG -out:$(TARGET) $(DLLLIBS) $(PERLLIB) 
+
+clean::
+	del *.obj
+	del *.dll
+	del *.pll
+	del *.lib
+	del *.exp
+	del *_wrap*
+	del *.pdb
+	del *.pch
+	del *.pm
+	del *.sl
+	del *~
+

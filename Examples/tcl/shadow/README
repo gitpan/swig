@@ -1,0 +1,50 @@
+An example showing how you can create an object oriented interface
+to SWIG generated functions using only a short Tcl script.  This is
+much more elegant than the default object-oriented interface generated
+by SWIG and probably more memory efficient.  On the downside, it may
+be a little slower, but it's still pretty cool.  
+
+swig_c++.tcl     -  A file containing the shadow class code
+list.tcl         -  An example that uses it.
+
+Contributed by Erik Bierwagen and Paul Saxe.  Many thanks!
+
+--------------------------------------------------------------------
+
+Dave,
+
+We have been using swig to wrap our C++ objects, and it works very well.
+A collegue of mine, Paul Saxe, wrote the attached script to make the
+object syntax match C++'s a bit more closely; all you need to do is
+source the script, and you can use the new syntax.
+
+The way it works is:
+
+To create an object:
+
+new {ObjectName} {Handle}
+
+To use an object:
+
+$Handle function arguments
+
+To delete an object:
+
+delete Handle.
+
+So, for a Vec with member functions length, get_elem, and set_elem:
+
+new Vec vector
+$vector length
+$vector set_elem 1 5
+delete vector
+
+This matches a little more closely the more "standard" object syntax,
+and also has the benefit that when the handle is unlinked, the object
+is automatically deleted.
+
+Enjoy!
+Erik
+
+
+

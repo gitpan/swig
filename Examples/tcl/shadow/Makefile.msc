@@ -1,0 +1,8 @@
+SRCS      = /Tp list.c
+INTERFACE = list.i
+WRAPFILE  = list_wrap.cxx
+TARGET    = list.dll
+SWIGOPT   = -c++ -noobject
+
+!include ..\..\..\Makefile.win
+

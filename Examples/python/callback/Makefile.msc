@@ -1,0 +1,8 @@
+SRCS      = widget.c foo.c
+INTERFACE = widget.i
+WRAPFILE  = widget_wrap.c
+TARGET    = callback.dll
+SWIGOPT   = 
+
+!include ..\..\..\Makefile.win
+

@@ -1,0 +1,7 @@
+SRCS      = 
+INTERFACE = interp.i
+WRAPFILE  = interp_wrap.c
+TARGET    = interp.dll
+
+!include ..\..\..\..\Makefile.win
+

@@ -1,0 +1,7 @@
+SRCS      = 
+INTERFACE = return.i
+WRAPFILE  = return_wrap.c
+TARGET    = retval.dll
+
+!include ..\..\..\..\Makefile.win
+

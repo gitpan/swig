@@ -1,0 +1,19 @@
+Perl Examples
+
+This directory contains a few examples of using GIFPlot with Perl.
+To make, edit the file 'Makefile' to reflect your local machine and
+type 'make'.   Then, just run Perl on the following examples to
+make a few plots
+
+simple.pl      -  Makes a simple image
+
+plotfunc3d.pl  -  Makes a 3D plot of a function.
+
+ball.pl        -  Makes a 3D ball
+
+weblog.pl      -  Makes a 3D plot of web-server hits
+
+
+This directory is still under construction.
+
+

@@ -1,0 +1,4 @@
+PDE solver from SWIG users manual.
+
+The script ex1.py contains a simple example.
+ex2.c is the same code written in C++.

@@ -1,0 +1,39 @@
+This directory contains examples for Guile.
+
+simple   - The simple example from the user manual.
+matrix   - A very simple Matrix example.
+
+You will need to edit the Makefile in this directory by
+hand and locate the Guile installation in order to build
+the examples.
+
+Last update : March 8, 1997 
+
+The SWIG Guile module was originally developed over a year
+ago for use with the Cygnus Guile-iii release by Tom Lord.
+This project is now officially dead, but Guile development is
+being continued by the Free Software Foundation.   The SWIG1.1b5
+release of SWIG is designed to work with FSF Guile 1.0 released
+in January of 1997.    The C API to Guile has consequently been
+changed to use the new 'gh' interface.  As a result, SWIG 
+generated modules will no longer compile with Guile-iii or any
+of the other Cygnus Guile releases (sorry).
+
+Guile may be obtained via anonymous FTP at :
+
+        ftp://prep.ai.mit.edu/pub/gnu
+
+If you want to use the older Cygnus version of Guile with SWIG, send
+e-mail to beazley@cs.utah.edu and I will check out the older Guile
+module from RCS and send it to you.
+
+
+(Disclaimer :  The SWIG guile module needs *alot* of work and a maintainer
+who has alot of spare time to devote to it.)
+
+
+
+
+
+
+

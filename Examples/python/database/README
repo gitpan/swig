@@ -1,0 +1,4 @@
+This example shows how one might pass C structures to and
+from Python as tuples instead of pointers.   This uses SWIG's
+typemap capability.
+

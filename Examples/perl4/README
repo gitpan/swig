@@ -1,0 +1,11 @@
+This directory contains examples for Perl4.
+
+simple   - The simple example from the user manual.
+matrix   - Matrix example from the user manual.
+tree     - Binary search trees in Perl4.
+
+You will need to edit the makefile Makefile in this
+directory and locate the perl4 source directory.
+
+These examples have remained unchanged since SWIG 0.1alpha
+and are quite dated.  Just be forwarned... 

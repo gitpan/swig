@@ -1,0 +1,33 @@
+##############################################################################
+# FileSelection(dialog_title, initial_filename, initial_directory, 
+#               ref_filters, flags)
+sub FileSelection {
+	my($title, $filename, $dir, $filter_ref, $flags) = @_;
+
+	# If parameters were missing, fill them in with appropriate values
+	$title = "Select File" if ($title eq "");
+	$dir = Win32::GetCwd if ($dir eq "");
+	if(!defined $flags) {
+		my($string, $major, $minor, $build, $id) = Win32::GetOSVersion;
+		# Set Explorer flag for Win95 or NT4+ or Longnames for other OS's
+		if(($id == 1) || (($id == 2) && ($major >= 4))) {
+			$flags |= $OFN_EXPLORER;
+		} else {
+			$flags |= $OFN_LONGNAMES;
+		}
+	}
+	# Set the file filters. If none have been specified, default to All Files (*.*)
+	local($filter);
+	if(defined $filter_ref) {
+		foreach $k (keys(%{$filter_ref})) {
+			$filter .= $k;
+			$filter .= '|';
+			$filter .= %{$filter_ref}->{$k};
+			$filter .= '|';
+		}
+	} else {
+		$filter = "All Files (*.*)|*.*|";
+	}
+
+	return FileSelDlg($title, $filename, $dir, $filter, $flags);
+}

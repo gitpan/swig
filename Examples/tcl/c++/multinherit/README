@@ -1,0 +1,6 @@
+This example tests SWIG's handling of multiple inheritance.
+Multiple inheritance support is new to SWIG 1.1.
+
+The file 'inherit.tcl' tests the module.
+
+

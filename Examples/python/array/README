@@ -1,0 +1,8 @@
+This example shows how one might create a new Python class in C++.
+It defines a simple array class with bounds checking.  C++ exceptions
+are raised for bounds violations.  These are then turned into Python
+exceptions.
+
+
+
+

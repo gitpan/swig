@@ -1,0 +1,5 @@
+Example from SWIG users manual.  Adds get/set methods to
+Grid2d class.
+
+ex6.py   - Sample script
+

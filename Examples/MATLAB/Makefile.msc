@@ -1,0 +1,10 @@
+all:
+	cl.exe main.cxx matlab.cxx -I../../Include -o swigmatlab ../../libswig.lib
+
+test:
+	swigmatlab example.i
+	mex example.c example_wrap.c
+
+clean:
+	rm -f myswig *_wrap* *.o *~ 
+

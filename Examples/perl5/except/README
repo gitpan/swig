@@ -1,0 +1,7 @@
+This example shows how you can define your own exception handling
+mechanism.  In this case, we will catch C++ exceptions and turn
+them into Perl exceptions.
+
+This example may not work with older versions of g++ or broken
+C++ compilers.
+
